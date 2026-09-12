@@ -312,6 +312,10 @@
     }
 
     @media (max-width: 860px) {
+      body {
+        padding: 8px;
+      }
+
       #pickleball-tournament-app {
         padding: 12px;
       }
@@ -329,6 +333,153 @@
 
       #pickleball-tournament-app .pb-screen {
         padding: 12px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      #pickleball-tournament-app {
+        border-radius: 0;
+        padding: 10px;
+      }
+
+      #pickleball-tournament-app .pb-shell {
+        gap: 12px;
+      }
+
+      #pickleball-tournament-app h2 {
+        font-size: 1.15rem;
+      }
+
+      #pickleball-tournament-app h3 {
+        font-size: 1rem;
+      }
+
+      #pickleball-tournament-app button,
+      #pickleball-tournament-app select,
+      #pickleball-tournament-app input {
+        min-height: 42px;
+      }
+
+      #pickleball-tournament-app .pb-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+      }
+
+      #pickleball-tournament-app .pb-actions button:last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+      }
+
+      #pickleball-tournament-app textarea {
+        min-height: 76px;
+      }
+
+      #pickleball-tournament-app .pb-card {
+        padding: 10px;
+      }
+
+      #pickleball-tournament-app .pb-group-name {
+        font-size: 0.92rem;
+      }
+
+      #pickleball-tournament-app .pb-table-wrap {
+        overflow-x: visible;
+      }
+
+      #pickleball-tournament-app .pb-schedule-table {
+        min-width: 0;
+      }
+
+      #pickleball-tournament-app .pb-schedule-table thead {
+        display: none;
+      }
+
+      #pickleball-tournament-app .pb-schedule-table,
+      #pickleball-tournament-app .pb-schedule-table tbody,
+      #pickleball-tournament-app .pb-schedule-table tr,
+      #pickleball-tournament-app .pb-schedule-table td {
+        display: block;
+        width: 100%;
+      }
+
+      #pickleball-tournament-app .pb-schedule-table tr {
+        border: 1px solid color-mix(in srgb, var(--pb-line) 72%, transparent);
+        border-radius: 8px;
+        margin-bottom: 10px;
+        overflow: hidden;
+        background: color-mix(in srgb, var(--card) 68%, transparent);
+      }
+
+      #pickleball-tournament-app .pb-schedule-table tr:last-child {
+        margin-bottom: 0;
+      }
+
+      #pickleball-tournament-app .pb-schedule-table td {
+        display: grid;
+        grid-template-columns: 82px minmax(0, 1fr);
+        gap: 8px;
+        align-items: center;
+        border-right: 0;
+        padding: 8px 10px;
+        text-align: left;
+      }
+
+      #pickleball-tournament-app .pb-schedule-table td::before {
+        color: var(--muted-foreground);
+      }
+
+      #pickleball-tournament-app .pb-schedule-table td:nth-child(1)::before {
+        content: "Round";
+      }
+
+      #pickleball-tournament-app .pb-schedule-table td:nth-child(2)::before {
+        content: "Team 1";
+      }
+
+      #pickleball-tournament-app .pb-schedule-table td:nth-child(3)::before {
+        content: "VS";
+      }
+
+      #pickleball-tournament-app .pb-schedule-table td:nth-child(4)::before {
+        content: "Team 2";
+      }
+
+      #pickleball-tournament-app .pb-schedule-table td:nth-child(5)::before {
+        content: "Score";
+      }
+
+      #pickleball-tournament-app .pb-schedule-table td:nth-child(6)::before {
+        content: "Bye";
+      }
+
+      #pickleball-tournament-app .pb-schedule-table .pb-vs {
+        width: 100%;
+      }
+
+      #pickleball-tournament-app .pb-score {
+        max-width: 180px;
+      }
+
+      #pickleball-tournament-app .pb-score input {
+        min-height: 38px;
+      }
+
+      #pickleball-tournament-app .pb-standing table {
+        min-width: 0;
+      }
+
+      #pickleball-tournament-app .pb-standing th,
+      #pickleball-tournament-app .pb-standing td {
+        padding: 8px 6px;
+      }
+
+      #pickleball-tournament-app .pb-standing th:first-child,
+      #pickleball-tournament-app .pb-standing td:first-child {
+        width: 48%;
+      }
+
+      #pickleball-tournament-app .pb-playoff table {
+        min-width: 440px;
       }
     }
 
