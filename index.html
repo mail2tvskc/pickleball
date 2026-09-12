@@ -258,6 +258,18 @@
       text-align: center;
     }
 
+    #pickleball-tournament-app .pb-schedule-table {
+      min-width: 620px;
+    }
+
+    #pickleball-tournament-app .pb-schedule-table .pb-score-col {
+      width: 18%;
+    }
+
+    #pickleball-tournament-app .pb-schedule-table .pb-bye-col {
+      width: 15%;
+    }
+
     #pickleball-tournament-app .pb-standing {
       margin-top: 14px;
     }
@@ -523,8 +535,8 @@
                 <span>:</span>
                 ${scoreInput(groupId, index, "t2", score.t2)}
               </div>
-              <div class="pb-bye">Bye: ${esc(round.bye || "TBD")}</div>
             </td>
+            <td class="pb-bye">${esc(round.bye || "TBD")}</td>
           </tr>
         `;
         }).join("");
@@ -533,14 +545,15 @@
           <section class="pb-card">
             <p class="pb-group-name"><strong>${names[groupId]}:</strong> ${esc(players.join(", ") || "Add five players")}</p>
             <div class="pb-table-wrap">
-              <table aria-label="${names[groupId]} schedule">
+              <table class="pb-schedule-table" aria-label="${names[groupId]} schedule">
                 <thead>
                   <tr>
                     <th>Round</th>
                     <th>Team 1</th>
                     <th class="pb-vs">VS</th>
                     <th>Team 2</th>
-                    <th>Score / Bye</th>
+                    <th class="pb-score-col">Score</th>
+                    <th class="pb-bye-col">Bye</th>
                   </tr>
                 </thead>
                 <tbody>${rows}</tbody>
