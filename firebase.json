@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "saturday-pickleball-cup",
     "public": ".",
     "ignore": [
       "firebase.json",
