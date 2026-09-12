@@ -324,6 +324,10 @@ h3 {
   min-width: 620px;
 }
 
+.playoff-schedule-table {
+  min-width: 620px;
+}
+
 .vs {
   width: 10%;
   font-weight: 500;
@@ -503,6 +507,26 @@ h3 {
 
   .schedule-table td:nth-child(6)::before {
     content: "Bye";
+  }
+
+  .playoff-schedule-table td:nth-child(1)::before {
+    content: "Round";
+  }
+
+  .playoff-schedule-table td:nth-child(2)::before {
+    content: "Match";
+  }
+
+  .playoff-schedule-table td:nth-child(3)::before {
+    content: "Team 1";
+  }
+
+  .playoff-schedule-table td:nth-child(4)::before {
+    content: "VS";
+  }
+
+  .playoff-schedule-table td:nth-child(5)::before {
+    content: "Team 2";
   }
 
   .score-entry {

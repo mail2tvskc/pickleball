@@ -375,40 +375,23 @@ function playoffScreen() {
   return `
     <section class="schedule-screen">
       <div class="screen-head">
-        <h2>3rd Place Playoff Schedule <span aria-label="Trophy">🏆</span></h2>
+        <h2>Playoff Schedule <span aria-label="Trophy">🏆</span></h2>
       </div>
-      <div class="playoff-flow">
-        <section class="tournament-card playoff-card">
-          <h3>Qualifying Matches</h3>
-          <div class="match-list">
-            <article class="match-card">
-              <p class="match-label">Match 1</p>
-              <div class="match-row">
-                <div class="match-team">A3 & C4</div>
-                <div class="match-vs">vs</div>
-                <div class="match-team">A4 & C3</div>
-              </div>
-            </article>
-            <article class="match-card">
-              <p class="match-label">Match 2</p>
-              <div class="match-row">
-                <div class="match-team">B3 & D4</div>
-                <div class="match-vs">vs</div>
-                <div class="match-team">B4 & D3</div>
-              </div>
-            </article>
-          </div>
-        </section>
-        <section class="tournament-card playoff-card">
-          <h3>3rd Place Final</h3>
-          <div class="match-card final">
-            <p class="match-label">Final</p>
-            <div class="match-row">
-              <div class="match-team">Winner Match 1</div>
-              <div class="match-vs">vs</div>
-              <div class="match-team">Winner Match 2</div>
-            </div>
-            <p class="playoff-note">Winner takes 3rd place.</p>
+      <div class="playoff-grid">
+        <section class="tournament-card">
+          <p class="group-name"><strong>3 Rounds:</strong> Qualifying Matches, 3rd Place Final, Final</p>
+          <div class="table-wrap">
+            <table class="schedule-table playoff-schedule-table" aria-label="Playoff schedule">
+              <thead>
+                <tr><th>Round</th><th>Match</th><th>Team 1</th><th class="vs">VS</th><th>Team 2</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Round 1</td><td class="highlight">Qualifying Match 1</td><td>A3 & C4</td><td class="vs">vs</td><td>A4 & C3</td></tr>
+                <tr><td>Round 1</td><td class="highlight">Qualifying Match 2</td><td>B3 & D4</td><td class="vs">vs</td><td>B4 & D3</td></tr>
+                <tr><td>Round 2</td><td class="highlight">3rd Place Final</td><td>Winner Match 1</td><td class="vs">vs</td><td>Winner Match 2</td></tr>
+                <tr><td>Round 3</td><td class="highlight">Final</td><td>Finalist 1</td><td class="vs">vs</td><td>Finalist 2</td></tr>
+              </tbody>
+            </table>
           </div>
         </section>
       </div>
