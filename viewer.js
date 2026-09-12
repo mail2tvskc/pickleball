@@ -202,6 +202,18 @@ function playoffWinner(matchId, fallback, matches) {
   return s1 > s2 ? match.team1 : match.team2;
 }
 
+function playoffResult(matchId, matches) {
+  const match = matches.find((item) => item.id === matchId);
+  const score = state.scores[playoffScoreKey(matchId)] || {};
+  const s1 = Number(score.t1);
+  const s2 = Number(score.t2);
+  if (!match || score.t1 === "" || score.t2 === "" || !Number.isFinite(s1) || !Number.isFinite(s2) || s1 === s2) return null;
+  return {
+    winner: s1 > s2 ? match.team1 : match.team2,
+    loser: s1 > s2 ? match.team2 : match.team1,
+  };
+}
+
 function playoffMatches() {
   const baseMatches = basePlayoffMatches();
 
@@ -210,6 +222,17 @@ function playoffMatches() {
     { id: "champ-final", bracket: "Championship Bracket", round: "Finals", match: "Final: Winner SF1 vs Winner SF2", team1: playoffWinner("champ-sf1", "Winner SF1", baseMatches), team2: playoffWinner("champ-sf2", "Winner SF2", baseMatches) },
     ...baseMatches.slice(2),
     { id: "third-final", bracket: "3rd Place Playoff Bracket", round: "Final", match: "3rd Final: Winner Q1 vs Winner Q2", team1: playoffWinner("third-q1", "Winner Q1", baseMatches), team2: playoffWinner("third-q2", "Winner Q2", baseMatches) },
+  ];
+}
+
+function playoffPlacements(matches) {
+  const championship = playoffResult("champ-final", matches);
+  const thirdPlace = playoffResult("third-final", matches);
+  return [
+    { place: "Champions", team: championship?.winner || "Winner Grand Final" },
+    { place: "Runners-up", team: championship?.loser || "Runner-up Grand Final" },
+    { place: "3rd Place", team: thirdPlace?.winner || "Winner 3rd Place Final" },
+    { place: "4th Place", team: thirdPlace?.loser || "Runner-up 3rd Place Final" },
   ];
 }
 
@@ -296,10 +319,17 @@ function playoffScreen() {
   const matches = playoffMatches();
   const championshipRows = matches.filter((match) => match.bracket === "Championship Bracket").map(playoffRow).join("");
   const thirdPlaceRows = matches.filter((match) => match.bracket === "3rd Place Playoff Bracket").map(playoffRow).join("");
+  const resultRows = playoffPlacements(matches).map((result) => `
+    <tr><td>${escapeHtml(result.place)}</td><td>${escapeHtml(result.team)}</td></tr>
+  `).join("");
   return `
     <section class="schedule-screen">
       <div class="screen-head"><h2>Playoff Schedule <span aria-label="Trophy">🏆</span></h2></div>
       <div class="playoff-grid">
+        <section class="tournament-card results-card">
+          <p class="group-name"><strong>Final Results</strong></p>
+          <div class="table-wrap"><table class="results-table" aria-label="Final playoff results"><thead><tr><th>Place</th><th>Team</th></tr></thead><tbody>${resultRows}</tbody></table></div>
+        </section>
         <section class="tournament-card third-place-card">
           <p class="group-name"><strong>3rd Place Playoff Bracket:</strong> 3rd and 4th ranked players cross-pair for 3rd place honors.</p>
           <div class="table-wrap"><table class="schedule-table playoff-schedule-table" aria-label="3rd place playoff bracket"><thead><tr><th>Round</th><th>Match</th><th>Team 1</th><th class="vs">VS</th><th>Team 2</th><th>Score</th></tr></thead><tbody>${thirdPlaceRows}</tbody></table></div>

@@ -395,6 +395,13 @@ h3 {
     linear-gradient(105deg, rgba(42, 31, 10, 0.92), rgba(18, 29, 18, 0.96));
 }
 
+.results-card {
+  border-color: rgba(255, 209, 102, 0.72);
+  background:
+    linear-gradient(135deg, rgba(255, 209, 102, 0.34), rgba(107, 214, 255, 0.18)),
+    linear-gradient(105deg, rgba(45, 35, 12, 0.94), rgba(9, 29, 31, 0.96));
+}
+
 .group-name {
   margin-bottom: 12px;
   overflow-wrap: anywhere;
@@ -439,6 +446,25 @@ h3 {
 .overall-table th {
   color: #241707;
   background: linear-gradient(90deg, #ffd166, #b7ef5f);
+}
+
+.results-table {
+  min-width: 420px;
+}
+
+.results-table th {
+  color: #241707;
+  background: linear-gradient(90deg, #ffd166, #6bd6ff);
+}
+
+.results-table td:first-child {
+  color: var(--gold);
+  width: 170px;
+}
+
+.results-table td:last-child {
+  color: var(--foreground);
+  width: auto;
 }
 
 .overall-table td:first-child {
@@ -725,6 +751,30 @@ h3 {
 
   .overall-card {
     padding: 8px;
+  }
+
+  .results-card {
+    padding: 8px;
+  }
+
+  .results-table {
+    min-width: 0;
+    table-layout: fixed;
+  }
+
+  .results-table th,
+  .results-table td {
+    padding: 9px 8px;
+  }
+
+  .results-table th:first-child,
+  .results-table td:first-child {
+    width: 104px;
+  }
+
+  .results-table th:last-child,
+  .results-table td:last-child {
+    width: auto;
   }
 
   .overall-card .table-wrap {
