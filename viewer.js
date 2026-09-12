@@ -35,7 +35,11 @@ if (!firebaseConfig.projectId) {
 async function loadTournament() {
   try {
     setStatus("Loading live scores...");
-    const url = `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents/tournaments/${tournamentId}?t=${Date.now()}`;
+    const params = new URLSearchParams({
+      key: firebaseConfig.apiKey,
+      t: String(Date.now()),
+    });
+    const url = `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents/tournaments/${tournamentId}?${params}`;
     const response = await fetch(url, { cache: "no-store" });
     if (!response.ok) throw new Error(`Firestore read failed: ${response.status}`);
     const documentData = await response.json();
@@ -43,7 +47,7 @@ async function loadTournament() {
     render();
     setStatus("Live scores loaded.");
   } catch (error) {
-    setStatus("Could not load live scores. Try Refresh scores.");
+    setStatus(`Could not load live scores (${error.message}).`);
     render();
   }
 }
