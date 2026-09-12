@@ -155,7 +155,7 @@ function basePlayoffMatches() {
       id: "champ-sf1",
       bracket: "Championship Bracket",
       round: "Semi-Finals",
-      match: "Semi-Final 1",
+      match: "SF1: A1 & C2 vs A2 & C1",
       team1: teamFromRanks({ group: "a", rank: 1 }, { group: "c", rank: 2 }),
       team2: teamFromRanks({ group: "a", rank: 2 }, { group: "c", rank: 1 }),
     },
@@ -163,7 +163,7 @@ function basePlayoffMatches() {
       id: "champ-sf2",
       bracket: "Championship Bracket",
       round: "Semi-Finals",
-      match: "Semi-Final 2",
+      match: "SF2: B1 & D2 vs D1 & B2",
       team1: teamFromRanks({ group: "b", rank: 1 }, { group: "d", rank: 2 }),
       team2: teamFromRanks({ group: "d", rank: 1 }, { group: "b", rank: 2 }),
     },
@@ -171,7 +171,7 @@ function basePlayoffMatches() {
       id: "third-q1",
       bracket: "3rd Place Playoff Bracket",
       round: "Qualifying",
-      match: "Match 1",
+      match: "Q1: A3 & C4 vs A4 & C3",
       team1: teamFromRanks({ group: "a", rank: 3 }, { group: "c", rank: 4 }),
       team2: teamFromRanks({ group: "a", rank: 4 }, { group: "c", rank: 3 }),
     },
@@ -179,7 +179,7 @@ function basePlayoffMatches() {
       id: "third-q2",
       bracket: "3rd Place Playoff Bracket",
       round: "Qualifying",
-      match: "Match 2",
+      match: "Q2: B3 & D4 vs B4 & D3",
       team1: teamFromRanks({ group: "b", rank: 3 }, { group: "d", rank: 4 }),
       team2: teamFromRanks({ group: "b", rank: 4 }, { group: "d", rank: 3 }),
     },
@@ -200,9 +200,9 @@ function playoffMatches() {
 
   return [
     ...baseMatches.slice(0, 2),
-    { id: "champ-final", bracket: "Championship Bracket", round: "Finals", match: "Grand Final", team1: playoffWinner("champ-sf1", "Winner SF 1", baseMatches), team2: playoffWinner("champ-sf2", "Winner SF 2", baseMatches) },
+    { id: "champ-final", bracket: "Championship Bracket", round: "Finals", match: "Final: Winner SF1 vs Winner SF2", team1: playoffWinner("champ-sf1", "Winner SF1", baseMatches), team2: playoffWinner("champ-sf2", "Winner SF2", baseMatches) },
     ...baseMatches.slice(2),
-    { id: "third-final", bracket: "3rd Place Playoff Bracket", round: "Final", match: "3rd Place Final", team1: playoffWinner("third-q1", "Winner Match 1", baseMatches), team2: playoffWinner("third-q2", "Winner Match 2", baseMatches) },
+    { id: "third-final", bracket: "3rd Place Playoff Bracket", round: "Final", match: "3rd Final: Winner Q1 vs Winner Q2", team1: playoffWinner("third-q1", "Winner Q1", baseMatches), team2: playoffWinner("third-q2", "Winner Q2", baseMatches) },
   ];
 }
 
