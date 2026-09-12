@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pickleball Tournament Board</title>
+  <style>
+    :root {
+      --background: #090a0c;
+      --foreground: #f5f2ea;
+      --card: rgba(28, 29, 31, 0.9);
+      --muted: rgba(245, 242, 234, 0.1);
+      --muted-foreground: #aaa399;
+      --primary: #90c9b3;
+      --accent: #e8cb83;
+      --border: rgba(245, 242, 234, 0.16);
+      --input: rgba(245, 242, 234, 0.22);
+      --viz-series-4: #e8cb83;
+    }
+
+    html {
+      background: var(--background);
+    }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      background: var(--background);
+    }
+  </style>
+</head>
+<body>
+<div id="pickleball-tournament-app">
+  <style>
+    #pickleball-tournament-app {
+      --pb-bg: color-mix(in srgb, var(--background) 82%, black 18%);
+      --pb-panel: color-mix(in srgb, var(--card) 78%, transparent);
+      --pb-line: color-mix(in srgb, var(--border) 72%, var(--foreground) 28%);
+      --pb-soft: color-mix(in srgb, var(--muted) 78%, transparent);
+      --pb-gold: color-mix(in srgb, var(--viz-series-4) 70%, var(--foreground) 30%);
+      color: var(--foreground);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      background:
+        radial-gradient(circle at 18% 12%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 24rem),
+        radial-gradient(circle at 82% 28%, color-mix(in srgb, var(--primary) 12%, transparent), transparent 22rem),
+        linear-gradient(145deg, var(--pb-bg), color-mix(in srgb, var(--background) 92%, black 8%));
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px;
+      overflow: hidden;
+    }
+
+    #pickleball-tournament-app * {
+      box-sizing: border-box;
+    }
+
+    #pickleball-tournament-app .pb-shell {
+      display: grid;
+      gap: 16px;
+    }
+
+    #pickleball-tournament-app .pb-toolbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: start;
+    }
+
+    #pickleball-tournament-app .pb-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
+    #pickleball-tournament-app h2,
+    #pickleball-tournament-app h3 {
+      margin: 0;
+      font-weight: 500;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    #pickleball-tournament-app .pb-cup {
+      color: var(--pb-gold);
+      filter: saturate(1.2);
+    }
+
+    #pickleball-tournament-app .pb-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: end;
+    }
+
+    #pickleball-tournament-app button,
+    #pickleball-tournament-app select,
+    #pickleball-tournament-app input,
+    #pickleball-tournament-app textarea {
+      border: 1px solid var(--input);
+      border-radius: 6px;
+      background: color-mix(in srgb, var(--card) 82%, transparent);
+      color: var(--foreground);
+      font: inherit;
+    }
+
+    #pickleball-tournament-app button,
+    #pickleball-tournament-app select,
+    #pickleball-tournament-app input {
+      min-height: 36px;
+      padding: 0 10px;
+    }
+
+    #pickleball-tournament-app button {
+      cursor: pointer;
+      background: color-mix(in srgb, var(--primary) 18%, var(--card));
+      border-color: color-mix(in srgb, var(--primary) 42%, var(--border));
+    }
+
+    #pickleball-tournament-app button:hover {
+      background: color-mix(in srgb, var(--primary) 26%, var(--card));
+    }
+
+    #pickleball-tournament-app .pb-editor {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    #pickleball-tournament-app .pb-field {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    #pickleball-tournament-app label {
+      color: var(--muted-foreground);
+      overflow-wrap: anywhere;
+    }
+
+    #pickleball-tournament-app textarea {
+      min-height: 92px;
+      resize: vertical;
+      padding: 10px;
+      width: 100%;
+    }
+
+    #pickleball-tournament-app .pb-settings {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    #pickleball-tournament-app .pb-stage {
+      display: grid;
+      gap: 18px;
+    }
+
+    #pickleball-tournament-app .pb-screen {
+      display: grid;
+      gap: 18px;
+      padding: 18px;
+      background:
+        linear-gradient(90deg, color-mix(in srgb, var(--card) 72%, transparent), transparent),
+        repeating-linear-gradient(112deg, transparent 0 24px, color-mix(in srgb, var(--foreground) 4%, transparent) 25px 26px);
+      border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+      border-radius: 8px;
+      box-shadow: 0 18px 44px color-mix(in srgb, black 30%, transparent);
+    }
+
+    #pickleball-tournament-app .pb-screen-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    #pickleball-tournament-app .pb-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    #pickleball-tournament-app .pb-card {
+      min-width: 0;
+      border: 1px solid color-mix(in srgb, var(--border) 78%, var(--foreground) 22%);
+      border-radius: 8px;
+      background: linear-gradient(105deg, color-mix(in srgb, var(--card) 88%, transparent), color-mix(in srgb, var(--muted) 58%, transparent));
+      box-shadow: 0 12px 28px color-mix(in srgb, black 24%, transparent);
+      padding: 14px;
+    }
+
+    #pickleball-tournament-app .pb-group-name {
+      margin: 0 0 12px;
+      overflow-wrap: anywhere;
+    }
+
+    #pickleball-tournament-app .pb-group-name strong {
+      font-weight: 500;
+    }
+
+    #pickleball-tournament-app .pb-table-wrap {
+      overflow-x: auto;
+      border-radius: 4px;
+    }
+
+    #pickleball-tournament-app table {
+      width: 100%;
+      min-width: 520px;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    #pickleball-tournament-app th,
+    #pickleball-tournament-app td {
+      border-right: 1px solid var(--pb-line);
+      border-bottom: 1px solid color-mix(in srgb, var(--pb-line) 70%, transparent);
+      padding: 9px 8px;
+      text-align: center;
+      vertical-align: middle;
+      overflow-wrap: anywhere;
+    }
+
+    #pickleball-tournament-app th:first-child,
+    #pickleball-tournament-app td:first-child {
+      text-align: left;
+      width: 21%;
+    }
+
+    #pickleball-tournament-app th:last-child,
+    #pickleball-tournament-app td:last-child {
+      border-right: 0;
+      width: 18%;
+    }
+
+    #pickleball-tournament-app th {
+      color: var(--muted-foreground);
+      background: color-mix(in srgb, var(--muted) 54%, transparent);
+      font-weight: 400;
+    }
+
+    #pickleball-tournament-app .pb-score {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: 5px;
+      align-items: center;
+    }
+
+    #pickleball-tournament-app .pb-score input {
+      width: 100%;
+      min-height: 30px;
+      padding: 0 6px;
+      text-align: center;
+    }
+
+    #pickleball-tournament-app .pb-standing {
+      margin-top: 14px;
+    }
+
+    #pickleball-tournament-app .pb-standing table {
+      min-width: 420px;
+    }
+
+    #pickleball-tournament-app .pb-standing th:first-child,
+    #pickleball-tournament-app .pb-standing td:first-child {
+      width: auto;
+    }
+
+    #pickleball-tournament-app .pb-standing th:last-child,
+    #pickleball-tournament-app .pb-standing td:last-child {
+      width: auto;
+    }
+
+    #pickleball-tournament-app .pb-vs {
+      width: 10%;
+      color: var(--foreground);
+      font-weight: 500;
+    }
+
+    #pickleball-tournament-app .pb-bye,
+    #pickleball-tournament-app .pb-highlight {
+      color: var(--pb-gold);
+    }
+
+    #pickleball-tournament-app .pb-playoff {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    #pickleball-tournament-app .pb-footer {
+      color: var(--muted-foreground);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 860px) {
+      #pickleball-tournament-app {
+        padding: 12px;
+      }
+
+      #pickleball-tournament-app .pb-toolbar,
+      #pickleball-tournament-app .pb-grid,
+      #pickleball-tournament-app .pb-editor,
+      #pickleball-tournament-app .pb-settings {
+        grid-template-columns: 1fr;
+      }
+
+      #pickleball-tournament-app .pb-actions {
+        justify-content: start;
+      }
+
+      #pickleball-tournament-app .pb-screen {
+        padding: 12px;
+      }
+    }
+
+    @media print {
+      #pickleball-tournament-app {
+        background: var(--background);
+        border: 0;
+      }
+
+      #pickleball-tournament-app .pb-editor,
+      #pickleball-tournament-app .pb-settings,
+      #pickleball-tournament-app .pb-actions,
+      #pickleball-tournament-app .pb-footer {
+        display: none;
+      }
+
+      #pickleball-tournament-app .pb-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+
+  <div class="pb-shell">
+    <div class="pb-toolbar">
+      <div class="pb-title">
+        <h2>Pickleball Tournament Schedule</h2>
+        <span class="pb-cup" aria-label="Trophy">🏆</span>
+      </div>
+      <div class="pb-actions">
+        <button type="button" data-action="sample">Sample</button>
+        <button type="button" data-action="clear-scores">Clear scores</button>
+        <button type="button" data-action="generate">Generate</button>
+        <button type="button" data-action="print">Print</button>
+      </div>
+    </div>
+
+    <div class="pb-settings">
+      <div class="pb-field">
+        <label for="pb-event-name">Event name</label>
+        <input id="pb-event-name" value="Saturday Pickleball Cup">
+      </div>
+      <div class="pb-field">
+        <label for="pb-view-mode">View</label>
+        <select id="pb-view-mode">
+          <option value="all">All groups</option>
+          <option value="ab">Group A &amp; Group B</option>
+          <option value="cd">Group C &amp; Group D</option>
+          <option value="playoff">3rd place playoff</option>
+        </select>
+      </div>
+      <div class="pb-field">
+        <label for="pb-courts">Courts</label>
+        <input id="pb-courts" type="number" min="1" max="12" value="2">
+      </div>
+    </div>
+
+    <div class="pb-editor" aria-label="Group player editor">
+      <div class="pb-field">
+        <label for="pb-group-a">Group A players</label>
+        <textarea id="pb-group-a">Revanth, Abhishek, Venkat P., Chaithanya, Ramu</textarea>
+      </div>
+      <div class="pb-field">
+        <label for="pb-group-b">Group B players</label>
+        <textarea id="pb-group-b">Venkat Y., Mourya, Wendy, Ratnakar, Sridhar</textarea>
+      </div>
+      <div class="pb-field">
+        <label for="pb-group-c">Group C players</label>
+        <textarea id="pb-group-c">Ravi, Srikanth, Krishna, Shankar, Jay</textarea>
+      </div>
+      <div class="pb-field">
+        <label for="pb-group-d">Group D players</label>
+        <textarea id="pb-group-d">Phani, Chaitanya T., Kishore, Sreenivasa, Ramesh</textarea>
+      </div>
+    </div>
+
+    <div class="pb-stage" id="pb-stage" aria-live="polite"></div>
+
+    <div class="pb-footer">
+      <span id="pb-summary"></span>
+      <span>Round-robin doubles: every pair once, one bye per round for five-player groups.</span>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const root = document.getElementById("pickleball-tournament-app");
+      const stage = root.querySelector("#pb-stage");
+      const summary = root.querySelector("#pb-summary");
+      const ids = ["a", "b", "c", "d"];
+      const names = { a: "Group A", b: "Group B", c: "Group C", d: "Group D" };
+      const storageKey = "pickleball-tournament-v1";
+      let scoreState = loadState();
+
+      const parsePlayers = (value) => value.split(/,|\n/).map((item) => item.trim()).filter(Boolean);
+      const team = (a, b) => `${a} & ${b}`;
+      const esc = (value) => String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      })[char]);
+
+      function loadState() {
+        try {
+          return JSON.parse(localStorage.getItem(storageKey)) || { scores: {} };
+        } catch (error) {
+          return { scores: {} };
+        }
+      }
+
+      function saveState() {
+        localStorage.setItem(storageKey, JSON.stringify(scoreState));
+      }
+
+      function doublesSchedule(players) {
+        const list = players.slice(0, 5);
+        const rounds = [];
+        for (let byeIndex = 4; byeIndex >= 0; byeIndex -= 1) {
+          const active = list.filter((_, index) => index !== byeIndex);
+          rounds.push({
+            id: `${players.join("|")}-${byeIndex}`,
+            p1: [active[0], active[1]].filter(Boolean),
+            p2: [active[2], active[3]].filter(Boolean),
+            team1: team(active[0], active[1]),
+            team2: team(active[2], active[3]),
+            bye: list[byeIndex]
+          });
+        }
+        return rounds;
+      }
+
+      function scoreKey(groupId, roundIndex) {
+        return `${groupId}-${roundIndex}`;
+      }
+
+      function scoreInput(groupId, roundIndex, side, value) {
+        return `<input data-score="${esc(scoreKey(groupId, roundIndex))}" data-side="${side}" inputmode="numeric" type="number" min="0" max="99" aria-label="${names[groupId]} round ${roundIndex + 1} ${side} score" value="${esc(value || "")}">`;
+      }
+
+      function standings(players, rounds, groupId) {
+        const table = new Map(players.map((player) => [player, {
+          player,
+          wins: 0,
+          losses: 0,
+          pointsFor: 0,
+          pointsAgainst: 0,
+          diff: 0,
+          played: 0
+        }]));
+
+        rounds.forEach((round, index) => {
+          const score = scoreState.scores[scoreKey(groupId, index)] || {};
+          const s1 = Number(score.t1);
+          const s2 = Number(score.t2);
+          if (!Number.isFinite(s1) || !Number.isFinite(s2) || score.t1 === "" || score.t2 === "" || s1 === s2) return;
+          const t1Won = s1 > s2;
+          round.p1.forEach((player) => {
+            const row = table.get(player);
+            if (!row) return;
+            row.played += 1;
+            row.wins += t1Won ? 1 : 0;
+            row.losses += t1Won ? 0 : 1;
+            row.pointsFor += s1;
+            row.pointsAgainst += s2;
+          });
+          round.p2.forEach((player) => {
+            const row = table.get(player);
+            if (!row) return;
+            row.played += 1;
+            row.wins += t1Won ? 0 : 1;
+            row.losses += t1Won ? 1 : 0;
+            row.pointsFor += s2;
+            row.pointsAgainst += s1;
+          });
+        });
+
+        return Array.from(table.values()).map((row) => ({
+          ...row,
+          diff: row.pointsFor - row.pointsAgainst
+        })).sort((a, b) => b.wins - a.wins || b.diff - a.diff || b.pointsFor - a.pointsFor || a.player.localeCompare(b.player));
+      }
+
+      function standingsTable(players, rounds, groupId) {
+        const rows = standings(players, rounds, groupId).map((row, index) => `
+          <tr>
+            <td>${index + 1}. ${esc(row.player)}</td>
+            <td>${row.played}</td>
+            <td>${row.wins}</td>
+            <td>${row.losses}</td>
+            <td>${row.pointsFor}</td>
+            <td>${row.pointsAgainst}</td>
+            <td>${row.diff}</td>
+          </tr>
+        `).join("");
+
+        return `
+          <div class="pb-standing">
+            <p class="pb-group-name"><strong>${names[groupId]} Standings</strong></p>
+            <div class="pb-table-wrap">
+              <table aria-label="${names[groupId]} standings">
+                <thead>
+                  <tr><th>Player</th><th>P</th><th>W</th><th>L</th><th>PF</th><th>PA</th><th>+/-</th></tr>
+                </thead>
+                <tbody>${rows}</tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+
+      function card(groupId, courtOffset) {
+        const players = parsePlayers(root.querySelector(`#pb-group-${groupId}`).value);
+        const rounds = doublesSchedule(players);
+        const rows = rounds.map((round, index) => {
+          const score = scoreState.scores[scoreKey(groupId, index)] || {};
+          return `
+          <tr>
+            <td>Round ${index + 1}</td>
+            <td>${esc(round.team1 || "TBD")}</td>
+            <td class="pb-vs">vs</td>
+            <td>${esc(round.team2 || "TBD")}</td>
+            <td>
+              <div class="pb-score">
+                ${scoreInput(groupId, index, "t1", score.t1)}
+                <span>:</span>
+                ${scoreInput(groupId, index, "t2", score.t2)}
+              </div>
+              <div class="pb-bye">Bye: ${esc(round.bye || "TBD")}</div>
+            </td>
+          </tr>
+        `;
+        }).join("");
+
+        return `
+          <section class="pb-card">
+            <p class="pb-group-name"><strong>${names[groupId]}:</strong> ${esc(players.join(", ") || "Add five players")}</p>
+            <div class="pb-table-wrap">
+              <table aria-label="${names[groupId]} schedule">
+                <thead>
+                  <tr>
+                    <th>Round</th>
+                    <th>Team 1</th>
+                    <th class="pb-vs">VS</th>
+                    <th>Team 2</th>
+                    <th>Score / Bye</th>
+                  </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+              </table>
+            </div>
+            ${standingsTable(players, rounds, groupId)}
+          </section>
+        `;
+      }
+
+      function groupScreen(title, groupIds) {
+        const courts = Math.max(1, Number(root.querySelector("#pb-courts").value) || 1);
+        return `
+          <section class="pb-screen">
+            <div class="pb-screen-head">
+              <h3>${esc(title)} <span class="pb-cup" aria-label="Trophy">🏆</span></h3>
+              <span>Court rotation: ${Array.from({ length: Math.min(courts, groupIds.length) }, (_, index) => `Court ${index + 1}`).join(", ")}</span>
+            </div>
+            <div class="pb-grid">
+              ${groupIds.map((id, index) => card(id, index)).join("")}
+            </div>
+          </section>
+        `;
+      }
+
+      function playoffScreen() {
+        return `
+          <section class="pb-screen">
+            <div class="pb-screen-head">
+              <h3>3rd Place Playoff Schedule <span class="pb-cup" aria-label="Trophy">🏆</span></h3>
+            </div>
+            <div class="pb-grid pb-playoff">
+              <section class="pb-card">
+                <h3 class="pb-group-name">Qualifying Matches</h3>
+                <div class="pb-table-wrap">
+                  <table aria-label="Qualifying matches">
+                    <thead><tr><th>Match</th><th>Team 1</th><th class="pb-vs">VS</th><th>Team 2</th></tr></thead>
+                    <tbody>
+                      <tr><td class="pb-highlight">Match 1</td><td class="pb-highlight">A3 &amp; C4</td><td class="pb-vs">vs</td><td>A4 &amp; C3</td></tr>
+                      <tr><td class="pb-highlight">Match 2</td><td>B3 &amp; D4</td><td class="pb-vs">vs</td><td>B4 &amp; D3</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+              <section class="pb-card">
+                <h3 class="pb-group-name">3rd Place Finals</h3>
+                <div class="pb-table-wrap">
+                  <table aria-label="3rd place final">
+                    <thead><tr><th>Match</th><th>Team 1</th><th class="pb-vs">VS</th><th>Team 2</th></tr></thead>
+                    <tbody>
+                      <tr><td class="pb-highlight">3rd Place Final</td><td>Winner Match 1</td><td class="pb-vs">vs</td><td>Winner Match 2</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            </div>
+          </section>
+        `;
+      }
+
+      function render() {
+        const view = root.querySelector("#pb-view-mode").value;
+        const eventName = root.querySelector("#pb-event-name").value.trim() || "Pickleball Tournament";
+        let html = "";
+        if (view === "all" || view === "ab") html += groupScreen(`Schedule: Group A & Group B`, ["a", "b"]);
+        if (view === "all" || view === "cd") html += groupScreen(`Schedule: Group C & Group D`, ["c", "d"]);
+        if (view === "all" || view === "playoff") html += playoffScreen();
+        stage.innerHTML = html;
+        const playerCount = ids.reduce((total, id) => total + parsePlayers(root.querySelector(`#pb-group-${id}`).value).length, 0);
+        summary.textContent = `${eventName}: ${playerCount} players across ${ids.length} groups`;
+        root.querySelectorAll("[data-score]").forEach((input) => {
+          input.addEventListener("input", (event) => {
+            const key = event.target.getAttribute("data-score");
+            const side = event.target.getAttribute("data-side");
+            scoreState.scores[key] = scoreState.scores[key] || {};
+            scoreState.scores[key][side] = event.target.value;
+            saveState();
+            render();
+          });
+        });
+      }
+
+      function loadSample() {
+        const sample = {
+          a: "Revanth, Abhishek, Venkat P., Chaithanya, Ramu",
+          b: "Venkat Y., Mourya, Wendy, Ratnakar, Sridhar",
+          c: "Ravi, Srikanth, Krishna, Shankar, Jay",
+          d: "Phani, Chaitanya T., Kishore, Sreenivasa, Ramesh"
+        };
+        ids.forEach((id) => {
+          root.querySelector(`#pb-group-${id}`).value = sample[id];
+        });
+        scoreState = { scores: {} };
+        saveState();
+        render();
+      }
+
+      root.querySelector("[data-action='sample']").addEventListener("click", loadSample);
+      root.querySelector("[data-action='clear-scores']").addEventListener("click", () => {
+        scoreState = { scores: {} };
+        saveState();
+        render();
+      });
+      root.querySelector("[data-action='generate']").addEventListener("click", render);
+      root.querySelector("[data-action='print']").addEventListener("click", () => window.print());
+      root.querySelectorAll("textarea, input, select").forEach((control) => {
+        control.addEventListener("input", render);
+        control.addEventListener("change", render);
+      });
+      render();
+    })();
+  </script>
+</div>
+</body>
+</html>
