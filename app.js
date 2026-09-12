@@ -270,8 +270,45 @@ function teamFromRanks(left, right) {
   return `${rankedPlayer(left.group, left.rank)} & ${rankedPlayer(right.group, right.rank)}`;
 }
 
-function playoffWinner(matchId, fallback) {
-  const match = playoffMatches().find((item) => item.id === matchId);
+function basePlayoffMatches() {
+  return [
+    {
+      id: "champ-sf1",
+      bracket: "Championship Bracket",
+      round: "Semi-Finals",
+      match: "Semi-Final 1",
+      team1: teamFromRanks({ group: "a", rank: 1 }, { group: "c", rank: 2 }),
+      team2: teamFromRanks({ group: "a", rank: 2 }, { group: "c", rank: 1 }),
+    },
+    {
+      id: "champ-sf2",
+      bracket: "Championship Bracket",
+      round: "Semi-Finals",
+      match: "Semi-Final 2",
+      team1: teamFromRanks({ group: "b", rank: 1 }, { group: "d", rank: 2 }),
+      team2: teamFromRanks({ group: "d", rank: 1 }, { group: "b", rank: 2 }),
+    },
+    {
+      id: "third-q1",
+      bracket: "3rd Place Playoff Bracket",
+      round: "Qualifying",
+      match: "Match 1",
+      team1: teamFromRanks({ group: "a", rank: 3 }, { group: "c", rank: 4 }),
+      team2: teamFromRanks({ group: "a", rank: 4 }, { group: "c", rank: 3 }),
+    },
+    {
+      id: "third-q2",
+      bracket: "3rd Place Playoff Bracket",
+      round: "Qualifying",
+      match: "Match 2",
+      team1: teamFromRanks({ group: "b", rank: 3 }, { group: "d", rank: 4 }),
+      team2: teamFromRanks({ group: "b", rank: 4 }, { group: "d", rank: 3 }),
+    },
+  ];
+}
+
+function playoffWinner(matchId, fallback, matches) {
+  const match = matches.find((item) => item.id === matchId);
   const score = state.scores[playoffScoreKey(matchId)] || {};
   const s1 = Number(score.t1);
   const s2 = Number(score.t2);
@@ -282,59 +319,26 @@ function playoffWinner(matchId, fallback) {
 }
 
 function playoffMatches() {
-  const championshipSf1 = {
-    id: "champ-sf1",
-    bracket: "Championship Bracket",
-    round: "Semi-Finals",
-    match: "Semi-Final 1",
-    team1: teamFromRanks({ group: "a", rank: 1 }, { group: "c", rank: 2 }),
-    team2: teamFromRanks({ group: "a", rank: 2 }, { group: "c", rank: 1 }),
-  };
-  const championshipSf2 = {
-    id: "champ-sf2",
-    bracket: "Championship Bracket",
-    round: "Semi-Finals",
-    match: "Semi-Final 2",
-    team1: teamFromRanks({ group: "b", rank: 1 }, { group: "d", rank: 2 }),
-    team2: teamFromRanks({ group: "d", rank: 1 }, { group: "b", rank: 2 }),
-  };
-  const thirdMatch1 = {
-    id: "third-q1",
-    bracket: "3rd Place Playoff Bracket",
-    round: "Qualifying",
-    match: "Match 1",
-    team1: teamFromRanks({ group: "a", rank: 3 }, { group: "c", rank: 4 }),
-    team2: teamFromRanks({ group: "a", rank: 4 }, { group: "c", rank: 3 }),
-  };
-  const thirdMatch2 = {
-    id: "third-q2",
-    bracket: "3rd Place Playoff Bracket",
-    round: "Qualifying",
-    match: "Match 2",
-    team1: teamFromRanks({ group: "b", rank: 3 }, { group: "d", rank: 4 }),
-    team2: teamFromRanks({ group: "b", rank: 4 }, { group: "d", rank: 3 }),
-  };
+  const baseMatches = basePlayoffMatches();
 
   return [
-    championshipSf1,
-    championshipSf2,
+    ...baseMatches.slice(0, 2),
     {
       id: "champ-final",
       bracket: "Championship Bracket",
       round: "Finals",
       match: "Grand Final",
-      team1: playoffWinner("champ-sf1", "Winner SF 1"),
-      team2: playoffWinner("champ-sf2", "Winner SF 2"),
+      team1: playoffWinner("champ-sf1", "Winner SF 1", baseMatches),
+      team2: playoffWinner("champ-sf2", "Winner SF 2", baseMatches),
     },
-    thirdMatch1,
-    thirdMatch2,
+    ...baseMatches.slice(2),
     {
       id: "third-final",
       bracket: "3rd Place Playoff Bracket",
       round: "Final",
       match: "3rd Place Final",
-      team1: playoffWinner("third-q1", "Winner Match 1"),
-      team2: playoffWinner("third-q2", "Winner Match 2"),
+      team1: playoffWinner("third-q1", "Winner Match 1", baseMatches),
+      team2: playoffWinner("third-q2", "Winner Match 2", baseMatches),
     },
   ];
 }
