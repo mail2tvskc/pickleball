@@ -379,17 +379,31 @@ function playoffScreen() {
       </div>
       <div class="playoff-grid">
         <section class="tournament-card">
-          <p class="group-name"><strong>3 Rounds:</strong> Qualifying Matches, 3rd Place Final, Final</p>
+          <p class="group-name"><strong>Championship Bracket:</strong> Top 2 players from each group advance.</p>
           <div class="table-wrap">
-            <table class="schedule-table playoff-schedule-table" aria-label="Playoff schedule">
+            <table class="schedule-table playoff-schedule-table" aria-label="Championship bracket">
               <thead>
                 <tr><th>Round</th><th>Match</th><th>Team 1</th><th class="vs">VS</th><th>Team 2</th></tr>
               </thead>
               <tbody>
-                <tr><td>Round 1</td><td class="highlight">Qualifying Match 1</td><td>A3 & C4</td><td class="vs">vs</td><td>A4 & C3</td></tr>
-                <tr><td>Round 1</td><td class="highlight">Qualifying Match 2</td><td>B3 & D4</td><td class="vs">vs</td><td>B4 & D3</td></tr>
-                <tr><td>Round 2</td><td class="highlight">3rd Place Final</td><td>Winner Match 1</td><td class="vs">vs</td><td>Winner Match 2</td></tr>
-                <tr><td>Round 3</td><td class="highlight">Final</td><td>Finalist 1</td><td class="vs">vs</td><td>Finalist 2</td></tr>
+                <tr><td>Semi-Finals</td><td class="highlight">Semi-Final 1</td><td>A1 & C2</td><td class="vs">vs</td><td>A2 & C1</td></tr>
+                <tr><td>Semi-Finals</td><td class="highlight">Semi-Final 2</td><td>B1 & D2</td><td class="vs">vs</td><td>D1 & B2</td></tr>
+                <tr><td>Finals</td><td class="highlight">Grand Final</td><td>Winner SF 1</td><td class="vs">vs</td><td>Winner SF 2</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="tournament-card">
+          <p class="group-name"><strong>3rd Place Playoff Bracket:</strong> 3rd and 4th ranked players cross-pair for 3rd place honors.</p>
+          <div class="table-wrap">
+            <table class="schedule-table playoff-schedule-table" aria-label="3rd place playoff bracket">
+              <thead>
+                <tr><th>Round</th><th>Match</th><th>Team 1</th><th class="vs">VS</th><th>Team 2</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Qualifying</td><td class="highlight">Match 1</td><td>A3 & C4</td><td class="vs">vs</td><td>A4 & C3</td></tr>
+                <tr><td>Qualifying</td><td class="highlight">Match 2</td><td>B3 & D4</td><td class="vs">vs</td><td>B4 & D3</td></tr>
+                <tr><td>Final</td><td class="highlight">3rd Place Final</td><td>Winner Match 1</td><td class="vs">vs</td><td>Winner Match 2</td></tr>
               </tbody>
             </table>
           </div>
