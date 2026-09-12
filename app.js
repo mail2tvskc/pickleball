@@ -37,6 +37,10 @@ const defaultState = {
   scores: {},
 };
 
+function cloneDefaultState() {
+  return JSON.parse(JSON.stringify(defaultState));
+}
+
 const appRoot = document.getElementById("app");
 const mode = appRoot.dataset.mode;
 const stage = document.getElementById("stage");
@@ -45,7 +49,7 @@ const updatedAt = document.getElementById("updated-at");
 const eventTitle = document.getElementById("event-title");
 const firebaseConfig = window.PICKLEBALL_FIREBASE_CONFIG || {};
 const tournamentId = window.PICKLEBALL_TOURNAMENT_ID || "main";
-let state = structuredClone(defaultState);
+let state = cloneDefaultState();
 let db;
 let auth;
 let tournamentRef;
@@ -79,7 +83,7 @@ function startApp() {
       render();
       setStatus(mode === "admin" ? "Latest scores loaded." : "Live scores loaded.");
     } else {
-      state = structuredClone(defaultState);
+      state = cloneDefaultState();
       render();
       setStatus(mode === "admin" ? "No tournament saved yet." : "Waiting for admin scores.");
     }
