@@ -367,7 +367,6 @@ function render() {
         state.scores[key] = state.scores[key] || {};
         state.scores[key][side] = event.target.value;
         scheduleSave();
-        render();
       });
     });
   }
