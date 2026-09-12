@@ -272,12 +272,12 @@ function playoffScreen() {
       <div class="screen-head"><h2>Playoff Schedule <span aria-label="Trophy">🏆</span></h2></div>
       <div class="playoff-grid">
         <section class="tournament-card">
-          <p class="group-name"><strong>Championship Bracket:</strong> Top 2 players from each group advance.</p>
-          <div class="table-wrap"><table class="schedule-table playoff-schedule-table" aria-label="Championship bracket"><thead><tr><th>Round</th><th>Match</th><th>Team 1</th><th class="vs">VS</th><th>Team 2</th><th>Score</th></tr></thead><tbody>${championshipRows}</tbody></table></div>
-        </section>
-        <section class="tournament-card">
           <p class="group-name"><strong>3rd Place Playoff Bracket:</strong> 3rd and 4th ranked players cross-pair for 3rd place honors.</p>
           <div class="table-wrap"><table class="schedule-table playoff-schedule-table" aria-label="3rd place playoff bracket"><thead><tr><th>Round</th><th>Match</th><th>Team 1</th><th class="vs">VS</th><th>Team 2</th><th>Score</th></tr></thead><tbody>${thirdPlaceRows}</tbody></table></div>
+        </section>
+        <section class="tournament-card">
+          <p class="group-name"><strong>Championship Bracket:</strong> Top 2 players from each group advance.</p>
+          <div class="table-wrap"><table class="schedule-table playoff-schedule-table" aria-label="Championship bracket"><thead><tr><th>Round</th><th>Match</th><th>Team 1</th><th class="vs">VS</th><th>Team 2</th><th>Score</th></tr></thead><tbody>${championshipRows}</tbody></table></div>
         </section>
       </div>
     </section>
