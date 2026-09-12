@@ -533,7 +533,9 @@ function scheduleSave() {
   if (!signedIn) return;
   setStatus("Saving...");
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveNow, 450);
+  saveTimer = setTimeout(() => {
+    saveNow().catch(handleSaveError);
+  }, 450);
 }
 
 async function saveNow() {
@@ -546,6 +548,11 @@ async function saveNow() {
     updatedAt: serverTimestamp(),
   }, { merge: true });
   setStatus("Saved.");
+}
+
+function handleSaveError(error) {
+  const denied = error?.code === "permission-denied";
+  setStatus(denied ? "Save failed: this account is not allowed to update scores." : "Save failed. Try again.");
 }
 
 function setStatus(message) {
