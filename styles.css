@@ -1,13 +1,17 @@
 :root {
-  --background: #090a0c;
-  --foreground: #f5f2ea;
-  --muted: #aaa399;
-  --panel: rgba(28, 29, 31, 0.84);
-  --panel-strong: rgba(18, 19, 21, 0.94);
-  --line: rgba(245, 242, 234, 0.22);
-  --input: rgba(245, 242, 234, 0.2);
-  --gold: #e8cb83;
-  --accent: #90c9b3;
+  --background: #071113;
+  --foreground: #fff9ee;
+  --muted: #c9c0b5;
+  --panel: rgba(16, 32, 36, 0.9);
+  --panel-strong: rgba(9, 18, 22, 0.96);
+  --line: rgba(255, 249, 238, 0.18);
+  --input: rgba(255, 249, 238, 0.28);
+  --gold: #ffd166;
+  --accent: #2dd4bf;
+  --lime: #b7ef5f;
+  --coral: #ff7a59;
+  --sky: #6bd6ff;
+  --ink: #071113;
 }
 
 * {
@@ -24,9 +28,10 @@ body {
   margin: 0;
   color: var(--foreground);
   background:
-    radial-gradient(circle at 16% 10%, rgba(144, 201, 179, 0.14), transparent 26rem),
-    radial-gradient(circle at 78% 18%, rgba(232, 203, 131, 0.1), transparent 22rem),
-    linear-gradient(145deg, #090a0c, #121315 48%, #08090a);
+    linear-gradient(135deg, rgba(45, 212, 191, 0.16), transparent 28%),
+    linear-gradient(225deg, rgba(255, 122, 89, 0.14), transparent 30%),
+    repeating-linear-gradient(118deg, transparent 0 28px, rgba(255, 255, 255, 0.035) 29px 30px),
+    linear-gradient(145deg, #071113, #102126 48%, #090b12);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }
 
@@ -57,20 +62,20 @@ button,
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  background: rgba(144, 201, 179, 0.13);
-  border-color: rgba(144, 201, 179, 0.34);
+  background: linear-gradient(135deg, rgba(45, 212, 191, 0.22), rgba(255, 209, 102, 0.16));
+  border-color: rgba(45, 212, 191, 0.46);
   text-decoration: none;
 }
 
 button:hover,
 .button-link:hover {
-  background: rgba(144, 201, 179, 0.21);
+  background: linear-gradient(135deg, rgba(45, 212, 191, 0.32), rgba(255, 209, 102, 0.24));
 }
 
 label {
   display: grid;
   gap: 7px;
-  color: var(--muted);
+  color: var(--sky);
 }
 
 textarea {
@@ -98,9 +103,21 @@ td {
 }
 
 th {
-  color: var(--muted);
-  background: rgba(255, 255, 255, 0.06);
+  color: var(--foreground);
+  background: linear-gradient(90deg, rgba(45, 212, 191, 0.22), rgba(255, 209, 102, 0.14));
   font-weight: 400;
+}
+
+tbody tr:nth-child(even) {
+  background: rgba(107, 214, 255, 0.045);
+}
+
+tbody tr:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.018);
+}
+
+td:first-child {
+  color: var(--sky);
 }
 
 th:first-child,
@@ -144,10 +161,10 @@ h3 {
 .schedule-screen,
 .status-panel,
 .actions-row {
-  border: 1px solid rgba(245, 242, 234, 0.14);
+  border: 1px solid rgba(255, 249, 238, 0.16);
   border-radius: 8px;
-  background: rgba(14, 15, 17, 0.7);
-  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.28);
+  background: rgba(10, 20, 24, 0.76);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.3);
 }
 
 .topbar {
@@ -156,11 +173,15 @@ h3 {
   justify-content: space-between;
   gap: 16px;
   padding: 18px;
+  border-color: rgba(255, 209, 102, 0.34);
+  background:
+    linear-gradient(90deg, rgba(255, 209, 102, 0.18), rgba(45, 212, 191, 0.14)),
+    linear-gradient(135deg, rgba(18, 31, 37, 0.96), rgba(9, 16, 22, 0.96));
 }
 
 .eyebrow {
   margin-bottom: 6px;
-  color: var(--gold);
+  color: var(--lime);
 }
 
 .actions,
@@ -196,7 +217,9 @@ h3 {
   gap: 10px;
   flex-wrap: wrap;
   padding: 12px 14px;
-  color: var(--muted);
+  color: var(--sky);
+  border-color: rgba(107, 214, 255, 0.26);
+  background: rgba(9, 22, 32, 0.72);
 }
 
 .schedule-stack {
@@ -209,8 +232,8 @@ h3 {
   gap: 18px;
   padding: 18px;
   background:
-    linear-gradient(90deg, rgba(32, 33, 36, 0.88), rgba(14, 15, 17, 0.72)),
-    repeating-linear-gradient(112deg, transparent 0 24px, rgba(255, 255, 255, 0.03) 25px 26px);
+    linear-gradient(90deg, rgba(14, 43, 47, 0.9), rgba(21, 23, 35, 0.76)),
+    repeating-linear-gradient(112deg, transparent 0 24px, rgba(255, 209, 102, 0.045) 25px 26px);
 }
 
 .screen-head {
@@ -223,6 +246,11 @@ h3 {
 
 .screen-head span {
   color: var(--gold);
+}
+
+.screen-head h2 {
+  color: var(--foreground);
+  text-shadow: 0 0 18px rgba(45, 212, 191, 0.22);
 }
 
 .group-grid {
@@ -257,9 +285,9 @@ h3 {
   display: grid;
   gap: 10px;
   padding: 12px;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(45, 212, 191, 0.24);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(45, 212, 191, 0.06);
 }
 
 .match-card.final {
@@ -302,9 +330,11 @@ h3 {
 .tournament-card {
   min-width: 0;
   padding: 14px;
-  border: 1px solid rgba(245, 242, 234, 0.2);
+  border: 1px solid rgba(255, 249, 238, 0.2);
   border-radius: 8px;
-  background: linear-gradient(105deg, var(--panel), var(--panel-strong));
+  background:
+    linear-gradient(105deg, var(--panel), var(--panel-strong)),
+    linear-gradient(180deg, rgba(255, 122, 89, 0.08), transparent);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
 }
 
@@ -315,11 +345,13 @@ h3 {
 
 .group-name strong {
   font-weight: 500;
+  color: var(--gold);
 }
 
 .table-wrap {
   overflow-x: auto;
   border-radius: 4px;
+  border: 1px solid rgba(255, 249, 238, 0.08);
 }
 
 .schedule-table {
@@ -347,16 +379,18 @@ h3 {
   min-height: 36px;
   padding: 0 5px;
   text-align: center;
+  border-color: rgba(183, 239, 95, 0.44);
+  background: rgba(183, 239, 95, 0.08);
 }
 
 .score-text {
-  color: var(--gold);
+  color: var(--lime);
   font-weight: 500;
 }
 
 .bye,
 .highlight {
-  color: var(--gold);
+  color: var(--coral);
 }
 
 .standings {
