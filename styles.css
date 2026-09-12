@@ -234,6 +234,69 @@ h3 {
   gap: 18px;
 }
 
+.playoff-flow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.55fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
+.playoff-card {
+  display: grid;
+  gap: 12px;
+}
+
+.match-list {
+  display: grid;
+  gap: 12px;
+}
+
+.match-card {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.match-card.final {
+  min-height: 100%;
+  align-content: center;
+  border-color: rgba(232, 203, 131, 0.42);
+  background: rgba(232, 203, 131, 0.07);
+}
+
+.match-label {
+  color: var(--gold);
+}
+
+.match-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.match-team {
+  min-height: 44px;
+  display: grid;
+  align-items: center;
+  padding: 9px 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.match-vs {
+  color: var(--muted);
+}
+
+.playoff-note {
+  color: var(--muted);
+}
+
 .tournament-card {
   min-width: 0;
   padding: 14px;
@@ -461,6 +524,18 @@ h3 {
 
   .playoff-grid table {
     min-width: 440px;
+  }
+
+  .playoff-flow {
+    grid-template-columns: 1fr;
+  }
+
+  .match-row {
+    grid-template-columns: 1fr;
+  }
+
+  .match-vs {
+    text-align: center;
   }
 }
 
