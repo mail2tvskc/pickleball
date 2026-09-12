@@ -211,6 +211,7 @@ function render() {
   let html = "";
   if (state.view === "all" || state.view === "ab") html += groupScreen("Schedule: Group A & Group B", ["a", "b"]);
   if (state.view === "all" || state.view === "cd") html += groupScreen("Schedule: Group C & Group D", ["c", "d"]);
+  if (state.view === "all" || state.view === "playoff") html += overallStandingsScreen();
   if (state.view === "all" || state.view === "playoff") html += playoffScreen();
   stage.innerHTML = html;
   updatedAtEl.textContent = state.updatedAt ? `Updated ${new Date(state.updatedAt).toLocaleTimeString()}` : "";
@@ -253,13 +254,34 @@ function groupCard(groupId) {
 
 function standingsTable(players, rounds, groupId) {
   const rows = standings(players, rounds, groupId).map((row, index) => `
-    <tr><td>${index + 1}. ${escapeHtml(row.player)}</td><td>${row.played}</td><td>${row.totalPoints}</td></tr>
+    <tr><td>${index + 1}. ${escapeHtml(row.player)}</td><td>${row.totalPoints}</td></tr>
   `).join("");
   return `
     <div class="standings">
       <p class="group-name"><strong>${groupNames[groupId]} Standings</strong></p>
-      <div class="table-wrap"><table aria-label="${groupNames[groupId]} standings"><thead><tr><th>Player</th><th>Games</th><th>Total Points</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <div class="table-wrap"><table aria-label="${groupNames[groupId]} standings"><thead><tr><th>Player</th><th>Total Points</th></tr></thead><tbody>${rows}</tbody></table></div>
     </div>
+  `;
+}
+
+function overallStandings() {
+  return groupIds.flatMap((groupId) => {
+    const players = parsePlayers(state.groups[groupId] || "");
+    return standings(players, getRounds(players), groupId);
+  }).sort((a, b) => b.totalPoints - a.totalPoints || a.player.localeCompare(b.player));
+}
+
+function overallStandingsScreen() {
+  const rows = overallStandings().map((row, index) => `
+    <tr><td>${index + 1}. ${escapeHtml(row.player)}</td><td>${row.totalPoints}</td></tr>
+  `).join("");
+  return `
+    <section class="schedule-screen">
+      <div class="screen-head"><h2>Overall Player Standings <span aria-label="Trophy">🏆</span></h2></div>
+      <section class="tournament-card">
+        <div class="table-wrap"><table aria-label="Overall player standings"><thead><tr><th>Player</th><th>Total Points</th></tr></thead><tbody>${rows}</tbody></table></div>
+      </section>
+    </section>
   `;
 }
 
