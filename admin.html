@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Pickleball Admin</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./firebase-config.js"></script>
+</head>
+<body>
+  <main id="app" class="app-shell" data-mode="admin">
+    <section class="topbar">
+      <div>
+        <p class="eyebrow">Admin score entry</p>
+        <h1 id="event-title">Pickleball Tournament</h1>
+      </div>
+      <div class="actions">
+        <a class="button-link" href="./index.html">Public board</a>
+        <button type="button" id="sign-out-button" hidden>Sign out</button>
+      </div>
+    </section>
+
+    <section id="login-panel" class="control-panel">
+      <label>
+        Admin email
+        <input id="admin-email" type="email" autocomplete="username" placeholder="you@example.com">
+      </label>
+      <label>
+        Password
+        <input id="admin-password" type="password" autocomplete="current-password">
+      </label>
+      <button type="button" id="sign-in-button">Sign in</button>
+    </section>
+
+    <section class="status-panel">
+      <span id="sync-status">Sign in to update scores.</span>
+      <span id="updated-at"></span>
+    </section>
+
+    <section id="admin-tools" hidden>
+      <section class="control-panel">
+        <label>
+          Event name
+          <input id="event-name" value="Saturday Pickleball Cup">
+        </label>
+        <label>
+          View
+          <select id="view-mode">
+            <option value="all">All groups</option>
+            <option value="ab">Group A & Group B</option>
+            <option value="cd">Group C & Group D</option>
+            <option value="playoff">3rd place playoff</option>
+          </select>
+        </label>
+        <label>
+          Courts
+          <input id="courts" type="number" min="1" max="12" value="2">
+        </label>
+      </section>
+
+      <section class="player-editor" aria-label="Group players">
+        <label>
+          Group A players
+          <textarea id="group-a"></textarea>
+        </label>
+        <label>
+          Group B players
+          <textarea id="group-b"></textarea>
+        </label>
+        <label>
+          Group C players
+          <textarea id="group-c"></textarea>
+        </label>
+        <label>
+          Group D players
+          <textarea id="group-d"></textarea>
+        </label>
+      </section>
+
+      <section class="actions-row">
+        <button type="button" id="sample-button">Load sample players</button>
+        <button type="button" id="clear-scores-button">Clear scores</button>
+        <button type="button" id="print-button">Print</button>
+      </section>
+    </section>
+
+    <section id="stage" class="schedule-stack" aria-live="polite"></section>
+  </main>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
