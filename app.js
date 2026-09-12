@@ -35,6 +35,7 @@ const defaultState = {
   courts: 2,
   groups: sampleGroups,
   scores: {},
+  finalResults: null,
 };
 
 function cloneDefaultState() {
@@ -198,6 +199,7 @@ function normalizeState(data) {
     courts: Number(data.courts || defaultState.courts),
     groups: { ...defaultState.groups, ...(data.groups || {}) },
     scores: data.scores || {},
+    finalResults: data.finalResults || null,
     updatedAt: data.updatedAt || null,
   };
 }
@@ -369,6 +371,15 @@ function playoffMatches() {
 }
 
 function playoffPlacements(matches) {
+  if (state.finalResults) {
+    return [
+      { place: "Champions", team: state.finalResults.champions || "Winner Grand Final" },
+      { place: "Runners-up", team: state.finalResults.runnersUp || "Runner-up Grand Final" },
+      { place: "3rd Place", team: state.finalResults.thirdPlace || "Winner 3rd Place Final" },
+      { place: "4th Place", team: state.finalResults.fourthPlace || "Runner-up 3rd Place Final" },
+    ];
+  }
+
   const championship = playoffResult("champ-final", matches);
   const thirdPlace = playoffResult("third-final", matches);
   return [
