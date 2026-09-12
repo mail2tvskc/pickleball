@@ -155,6 +155,23 @@
       gap: 10px;
     }
 
+    #pickleball-tournament-app .pb-sync {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 8px;
+      align-items: end;
+      padding: 10px;
+      border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--card) 48%, transparent);
+    }
+
+    #pickleball-tournament-app .pb-sync-status {
+      color: var(--muted-foreground);
+      align-self: center;
+      overflow-wrap: anywhere;
+    }
+
     #pickleball-tournament-app .pb-stage {
       display: grid;
       gap: 18px;
@@ -323,7 +340,8 @@
       #pickleball-tournament-app .pb-toolbar,
       #pickleball-tournament-app .pb-grid,
       #pickleball-tournament-app .pb-editor,
-      #pickleball-tournament-app .pb-settings {
+      #pickleball-tournament-app .pb-settings,
+      #pickleball-tournament-app .pb-sync {
         grid-template-columns: 1fr;
       }
 
@@ -478,6 +496,10 @@
         width: 48%;
       }
 
+      #pickleball-tournament-app .pb-sync button {
+        width: 100%;
+      }
+
       #pickleball-tournament-app .pb-playoff table {
         min-width: 440px;
       }
@@ -536,6 +558,15 @@
       </div>
     </div>
 
+    <div class="pb-sync">
+      <div class="pb-field">
+        <label for="pb-sheet-url">Google Sheet sync URL</label>
+        <input id="pb-sheet-url" placeholder="Paste Apps Script web app URL">
+      </div>
+      <button type="button" data-action="load-sheet">Load scores</button>
+      <span id="pb-sync-status" class="pb-sync-status">Local only</span>
+    </div>
+
     <div class="pb-editor" aria-label="Group player editor">
       <div class="pb-field">
         <label for="pb-group-a">Group A players</label>
@@ -568,9 +599,12 @@
       const root = document.getElementById("pickleball-tournament-app");
       const stage = root.querySelector("#pb-stage");
       const summary = root.querySelector("#pb-summary");
+      const syncStatus = root.querySelector("#pb-sync-status");
       const ids = ["a", "b", "c", "d"];
       const names = { a: "Group A", b: "Group B", c: "Group C", d: "Group D" };
       const storageKey = "pickleball-tournament-v1";
+      const syncUrlKey = "pickleball-tournament-sync-url";
+      let saveTimer;
       let scoreState = loadState();
 
       const parsePlayers = (value) => value.split(/,|\n/).map((item) => item.trim()).filter(Boolean);
@@ -589,6 +623,79 @@
 
       function saveState() {
         localStorage.setItem(storageKey, JSON.stringify(scoreState));
+      }
+
+      function getSyncUrl() {
+        return root.querySelector("#pb-sheet-url").value.trim();
+      }
+
+      function setSyncStatus(message) {
+        syncStatus.textContent = message;
+      }
+
+      function saveSyncUrl() {
+        localStorage.setItem(syncUrlKey, getSyncUrl());
+      }
+
+      function scheduleSheetSave() {
+        const url = getSyncUrl();
+        saveSyncUrl();
+        if (!url) {
+          setSyncStatus("Local only");
+          return;
+        }
+        setSyncStatus("Saving to Sheet...");
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(() => saveScoresToSheet(url), 450);
+      }
+
+      function saveScoresToSheet(url) {
+        fetch(url, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "saveScores",
+            updatedAt: new Date().toISOString(),
+            scores: scoreState.scores
+          })
+        }).then(() => {
+          setSyncStatus("Saved to Sheet");
+        }).catch(() => {
+          setSyncStatus("Sheet save failed");
+        });
+      }
+
+      function loadScoresFromSheet() {
+        const url = getSyncUrl();
+        saveSyncUrl();
+        if (!url) {
+          setSyncStatus("Add sync URL first");
+          return;
+        }
+        const callbackName = `pickleballSheetLoad${Date.now()}`;
+        const script = document.createElement("script");
+        const separator = url.includes("?") ? "&" : "?";
+        setSyncStatus("Loading from Sheet...");
+        window[callbackName] = (payload) => {
+          delete window[callbackName];
+          script.remove();
+          if (!payload || payload.ok === false) {
+            setSyncStatus("Sheet load failed");
+            return;
+          }
+          scoreState = { scores: payload.scores || {} };
+          saveState();
+          setSyncStatus("Loaded latest scores");
+          render();
+        };
+        script.onerror = () => {
+          delete window[callbackName];
+          script.remove();
+          setSyncStatus("Sheet load failed");
+        };
+        script.src = `${url}${separator}action=loadScores&callback=${encodeURIComponent(callbackName)}&t=${Date.now()}`;
+        document.body.appendChild(script);
       }
 
       function doublesSchedule(players) {
@@ -782,6 +889,7 @@
             scoreState.scores[key] = scoreState.scores[key] || {};
             scoreState.scores[key][side] = event.target.value;
             saveState();
+            scheduleSheetSave();
             render();
           });
         });
@@ -799,6 +907,7 @@
         });
         scoreState = { scores: {} };
         saveState();
+        scheduleSheetSave();
         render();
       }
 
@@ -806,14 +915,23 @@
       root.querySelector("[data-action='clear-scores']").addEventListener("click", () => {
         scoreState = { scores: {} };
         saveState();
+        scheduleSheetSave();
         render();
       });
+      root.querySelector("[data-action='load-sheet']").addEventListener("click", loadScoresFromSheet);
       root.querySelector("[data-action='generate']").addEventListener("click", render);
       root.querySelector("[data-action='print']").addEventListener("click", () => window.print());
+      root.querySelector("#pb-sheet-url").value = localStorage.getItem(syncUrlKey) || "";
+      root.querySelector("#pb-sheet-url").addEventListener("input", () => {
+        saveSyncUrl();
+        setSyncStatus(getSyncUrl() ? "Sheet sync ready" : "Local only");
+      });
       root.querySelectorAll("textarea, input, select").forEach((control) => {
+        if (control.id === "pb-sheet-url") return;
         control.addEventListener("input", render);
         control.addEventListener("change", render);
       });
+      setSyncStatus(getSyncUrl() ? "Sheet sync ready" : "Local only");
       render();
     })();
   </script>
