@@ -246,10 +246,10 @@ function groupCard(groupId) {
     `;
   }).join("");
   return `
-    <section class="tournament-card">
+    <section class="tournament-card group-card group-${groupId}">
       <p class="group-name"><strong>${groupNames[groupId]}:</strong> ${escapeHtml(players.join(", ") || "Add five players")}</p>
       <div class="table-wrap">
-        <table class="schedule-table" aria-label="${groupNames[groupId]} schedule">
+        <table class="schedule-table group-schedule-table" aria-label="${groupNames[groupId]} schedule">
           <thead><tr><th>Round</th><th>Team 1</th><th class="vs">VS</th><th>Team 2</th><th>Score</th><th>Bye</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
@@ -266,7 +266,7 @@ function standingsTable(players, rounds, groupId) {
   return `
     <div class="standings">
       <p class="group-name"><strong>${groupNames[groupId]} Standings</strong></p>
-      <div class="table-wrap"><table aria-label="${groupNames[groupId]} standings"><thead><tr><th>Player</th><th>Total Points</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <div class="table-wrap"><table class="standings-table" aria-label="${groupNames[groupId]} standings"><thead><tr><th>Player</th><th>Total Points</th></tr></thead><tbody>${rows}</tbody></table></div>
     </div>
   `;
 }
@@ -283,10 +283,10 @@ function overallStandingsScreen() {
     <tr><td>${index + 1}. ${escapeHtml(row.player)}</td><td>${row.totalPoints}</td></tr>
   `).join("");
   return `
-    <section class="schedule-screen">
+    <section class="schedule-screen overall-screen">
       <div class="screen-head"><h2>Overall Player Standings <span aria-label="Trophy">🏆</span></h2></div>
-      <section class="tournament-card">
-        <div class="table-wrap"><table aria-label="Overall player standings"><thead><tr><th>Player</th><th>Total Points</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <section class="tournament-card overall-card">
+        <div class="table-wrap"><table class="overall-table" aria-label="Overall player standings"><thead><tr><th>Player</th><th>Total Points</th></tr></thead><tbody>${rows}</tbody></table></div>
       </section>
     </section>
   `;
@@ -300,11 +300,11 @@ function playoffScreen() {
     <section class="schedule-screen">
       <div class="screen-head"><h2>Playoff Schedule <span aria-label="Trophy">🏆</span></h2></div>
       <div class="playoff-grid">
-        <section class="tournament-card">
+        <section class="tournament-card third-place-card">
           <p class="group-name"><strong>3rd Place Playoff Bracket:</strong> 3rd and 4th ranked players cross-pair for 3rd place honors.</p>
           <div class="table-wrap"><table class="schedule-table playoff-schedule-table" aria-label="3rd place playoff bracket"><thead><tr><th>Round</th><th>Match</th><th>Team 1</th><th class="vs">VS</th><th>Team 2</th><th>Score</th></tr></thead><tbody>${thirdPlaceRows}</tbody></table></div>
         </section>
-        <section class="tournament-card">
+        <section class="tournament-card championship-card">
           <p class="group-name"><strong>Championship Bracket:</strong> Top 2 players from each group advance.</p>
           <div class="table-wrap"><table class="schedule-table playoff-schedule-table" aria-label="Championship bracket"><thead><tr><th>Round</th><th>Match</th><th>Team 1</th><th class="vs">VS</th><th>Team 2</th><th>Score</th></tr></thead><tbody>${championshipRows}</tbody></table></div>
         </section>

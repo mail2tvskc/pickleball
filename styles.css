@@ -11,6 +11,8 @@
   --lime: #b7ef5f;
   --coral: #ff7a59;
   --sky: #6bd6ff;
+  --violet: #b794f4;
+  --rose: #ff8fb3;
   --ink: #071113;
 }
 
@@ -338,6 +340,61 @@ h3 {
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
 }
 
+.group-card.group-a {
+  border-color: rgba(107, 214, 255, 0.38);
+  background:
+    linear-gradient(135deg, rgba(28, 111, 165, 0.46), rgba(8, 31, 54, 0.72)),
+    linear-gradient(105deg, var(--panel), var(--panel-strong));
+}
+
+.group-card.group-b {
+  border-color: rgba(183, 239, 95, 0.38);
+  background:
+    linear-gradient(135deg, rgba(85, 139, 47, 0.42), rgba(18, 55, 35, 0.7)),
+    linear-gradient(105deg, var(--panel), var(--panel-strong));
+}
+
+.group-card.group-c {
+  border-color: rgba(183, 148, 244, 0.42);
+  background:
+    linear-gradient(135deg, rgba(103, 58, 183, 0.42), rgba(40, 27, 70, 0.72)),
+    linear-gradient(105deg, var(--panel), var(--panel-strong));
+}
+
+.group-card.group-d {
+  border-color: rgba(255, 143, 179, 0.42);
+  background:
+    linear-gradient(135deg, rgba(188, 71, 103, 0.4), rgba(72, 24, 43, 0.72)),
+    linear-gradient(105deg, var(--panel), var(--panel-strong));
+}
+
+.overall-screen {
+  background:
+    linear-gradient(90deg, rgba(111, 78, 9, 0.72), rgba(20, 63, 59, 0.68)),
+    repeating-linear-gradient(112deg, transparent 0 24px, rgba(255, 249, 238, 0.055) 25px 26px);
+}
+
+.overall-card {
+  border-color: rgba(255, 209, 102, 0.58);
+  background:
+    linear-gradient(135deg, rgba(255, 209, 102, 0.28), rgba(255, 122, 89, 0.14)),
+    linear-gradient(105deg, rgba(45, 35, 12, 0.92), rgba(21, 24, 18, 0.96));
+}
+
+.third-place-card {
+  border-color: rgba(255, 122, 89, 0.48);
+  background:
+    linear-gradient(135deg, rgba(255, 122, 89, 0.25), rgba(183, 148, 244, 0.16)),
+    linear-gradient(105deg, rgba(44, 21, 20, 0.92), rgba(21, 18, 31, 0.96));
+}
+
+.championship-card {
+  border-color: rgba(255, 209, 102, 0.58);
+  background:
+    linear-gradient(135deg, rgba(255, 209, 102, 0.31), rgba(183, 239, 95, 0.16)),
+    linear-gradient(105deg, rgba(42, 31, 10, 0.92), rgba(18, 29, 18, 0.96));
+}
+
 .group-name {
   margin-bottom: 12px;
   overflow-wrap: anywhere;
@@ -352,6 +409,49 @@ h3 {
   overflow-x: auto;
   border-radius: 4px;
   border: 1px solid rgba(255, 249, 238, 0.08);
+  background: rgba(255, 249, 238, 0.05);
+}
+
+.group-schedule-table th {
+  background: linear-gradient(90deg, rgba(107, 214, 255, 0.38), rgba(45, 212, 191, 0.24));
+}
+
+.group-a .group-schedule-table th {
+  background: linear-gradient(90deg, rgba(107, 214, 255, 0.42), rgba(45, 212, 191, 0.23));
+}
+
+.group-b .group-schedule-table th {
+  background: linear-gradient(90deg, rgba(183, 239, 95, 0.38), rgba(45, 212, 191, 0.22));
+}
+
+.group-c .group-schedule-table th {
+  background: linear-gradient(90deg, rgba(183, 148, 244, 0.42), rgba(107, 214, 255, 0.2));
+}
+
+.group-d .group-schedule-table th {
+  background: linear-gradient(90deg, rgba(255, 143, 179, 0.42), rgba(255, 209, 102, 0.18));
+}
+
+.standings-table th {
+  background: linear-gradient(90deg, rgba(183, 239, 95, 0.36), rgba(45, 212, 191, 0.22));
+}
+
+.overall-table th {
+  color: #241707;
+  background: linear-gradient(90deg, #ffd166, #b7ef5f);
+}
+
+.overall-table td:first-child {
+  color: var(--gold);
+}
+
+.third-place-card .playoff-schedule-table th {
+  background: linear-gradient(90deg, rgba(255, 122, 89, 0.44), rgba(183, 148, 244, 0.22));
+}
+
+.championship-card .playoff-schedule-table th {
+  color: #241707;
+  background: linear-gradient(90deg, #ffd166, #b7ef5f);
 }
 
 .schedule-table {
@@ -504,7 +604,31 @@ h3 {
     border-radius: 8px;
     margin-bottom: 10px;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 249, 238, 0.08);
+  }
+
+  .group-a .schedule-table tr {
+    background: rgba(107, 214, 255, 0.13);
+  }
+
+  .group-b .schedule-table tr {
+    background: rgba(183, 239, 95, 0.12);
+  }
+
+  .group-c .schedule-table tr {
+    background: rgba(183, 148, 244, 0.14);
+  }
+
+  .group-d .schedule-table tr {
+    background: rgba(255, 143, 179, 0.13);
+  }
+
+  .third-place-card .schedule-table tr {
+    background: rgba(255, 122, 89, 0.14);
+  }
+
+  .championship-card .schedule-table tr {
+    background: rgba(255, 209, 102, 0.15);
   }
 
   .schedule-table tr:last-child {
@@ -522,7 +646,7 @@ h3 {
   }
 
   .schedule-table td::before {
-    color: var(--muted);
+    color: var(--gold);
   }
 
   .schedule-table td:nth-child(1)::before {
