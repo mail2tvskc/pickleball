@@ -1,0 +1,294 @@
+const groupIds = ["a", "b", "c", "d"];
+const groupNames = { a: "Group A", b: "Group B", c: "Group C", d: "Group D" };
+const defaultGroups = {
+  a: "Revanth, Abhishek, Venkat P., Chaithanya, Ramu",
+  b: "Venkat Y., Mourya, Wendy, Ratnakar, Sridhar",
+  c: "Ravi, Srikanth, Krishna, Shankar, Jay",
+  d: "Phani, Chaitanya T., Kishore, Sreenivasa, Ramesh",
+};
+const defaultState = {
+  eventName: "Saturday Pickleball Cup",
+  view: "all",
+  courts: 2,
+  groups: defaultGroups,
+  scores: {},
+};
+
+const firebaseConfig = window.PICKLEBALL_FIREBASE_CONFIG || {};
+const tournamentId = window.PICKLEBALL_TOURNAMENT_ID || "main";
+const stage = document.getElementById("stage");
+const statusEl = document.getElementById("sync-status");
+const updatedAtEl = document.getElementById("updated-at");
+const eventTitle = document.getElementById("event-title");
+let state = { ...defaultState };
+
+document.getElementById("refresh-button")?.addEventListener("click", loadTournament);
+
+if (!firebaseConfig.projectId) {
+  setStatus("Firebase config missing.");
+  render();
+} else {
+  loadTournament();
+  window.setInterval(loadTournament, 30000);
+}
+
+async function loadTournament() {
+  try {
+    setStatus("Loading live scores...");
+    const url = `https://firestore.googleapis.com/v1/projects/${firebaseConfig.projectId}/databases/(default)/documents/tournaments/${tournamentId}?t=${Date.now()}`;
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) throw new Error(`Firestore read failed: ${response.status}`);
+    const documentData = await response.json();
+    state = normalizeState(fromFirestoreFields(documentData.fields || {}));
+    render();
+    setStatus("Live scores loaded.");
+  } catch (error) {
+    setStatus("Could not load live scores. Try Refresh scores.");
+    render();
+  }
+}
+
+function fromFirestoreFields(fields) {
+  const output = {};
+  Object.entries(fields).forEach(([key, value]) => {
+    output[key] = fromFirestoreValue(value);
+  });
+  return output;
+}
+
+function fromFirestoreValue(value) {
+  if ("stringValue" in value) return value.stringValue;
+  if ("integerValue" in value) return Number(value.integerValue);
+  if ("doubleValue" in value) return Number(value.doubleValue);
+  if ("booleanValue" in value) return Boolean(value.booleanValue);
+  if ("timestampValue" in value) return value.timestampValue;
+  if ("mapValue" in value) return fromFirestoreFields(value.mapValue.fields || {});
+  if ("arrayValue" in value) return (value.arrayValue.values || []).map(fromFirestoreValue);
+  return "";
+}
+
+function normalizeState(data) {
+  return {
+    eventName: data.eventName || defaultState.eventName,
+    view: data.view || defaultState.view,
+    courts: Number(data.courts || defaultState.courts),
+    groups: { ...defaultGroups, ...(data.groups || {}) },
+    scores: data.scores || {},
+    updatedAt: data.updatedAt || null,
+  };
+}
+
+function parsePlayers(value) {
+  return value.split(/,|\n/).map((item) => item.trim()).filter(Boolean).slice(0, 5);
+}
+
+function team(players) {
+  return players.filter(Boolean).join(" & ") || "TBD";
+}
+
+function getRounds(players) {
+  const list = players.slice(0, 5);
+  while (list.length < 5) list.push("TBD");
+  return [4, 3, 2, 1, 0].map((byeIndex) => {
+    const active = list.filter((_, index) => index !== byeIndex);
+    return {
+      p1: [active[0], active[1]].filter((player) => player !== "TBD"),
+      p2: [active[2], active[3]].filter((player) => player !== "TBD"),
+      team1: team([active[0], active[1]]),
+      team2: team([active[2], active[3]]),
+      bye: list[byeIndex],
+    };
+  });
+}
+
+function scoreKey(groupId, roundIndex) {
+  return `${groupId}-${roundIndex}`;
+}
+
+function playoffScoreKey(matchId) {
+  return `playoff-${matchId}`;
+}
+
+function standings(players, rounds, groupId) {
+  const rows = new Map(players.map((player) => [player, { player, played: 0, totalPoints: 0 }]));
+  rounds.forEach((round, index) => {
+    const score = state.scores[scoreKey(groupId, index)] || {};
+    const s1 = Number(score.t1);
+    const s2 = Number(score.t2);
+    if (!Number.isFinite(s1) || !Number.isFinite(s2) || score.t1 === "" || score.t2 === "") return;
+    round.p1.forEach((player) => {
+      const row = rows.get(player);
+      if (!row) return;
+      row.played += 1;
+      row.totalPoints += s1;
+    });
+    round.p2.forEach((player) => {
+      const row = rows.get(player);
+      if (!row) return;
+      row.played += 1;
+      row.totalPoints += s2;
+    });
+  });
+  return Array.from(rows.values()).sort((a, b) => b.totalPoints - a.totalPoints || a.player.localeCompare(b.player));
+}
+
+function groupRankings(groupId) {
+  const players = parsePlayers(state.groups[groupId] || "");
+  return standings(players, getRounds(players), groupId);
+}
+
+function rankedPlayer(groupId, rank) {
+  return groupRankings(groupId)[rank - 1]?.player || `${groupId.toUpperCase()}${rank}`;
+}
+
+function teamFromRanks(left, right) {
+  return `${rankedPlayer(left.group, left.rank)} & ${rankedPlayer(right.group, right.rank)}`;
+}
+
+function playoffWinner(matchId, fallback) {
+  const match = playoffMatches().find((item) => item.id === matchId);
+  const score = state.scores[playoffScoreKey(matchId)] || {};
+  const s1 = Number(score.t1);
+  const s2 = Number(score.t2);
+  if (!match || score.t1 === "" || score.t2 === "" || !Number.isFinite(s1) || !Number.isFinite(s2) || s1 === s2) return fallback;
+  return s1 > s2 ? match.team1 : match.team2;
+}
+
+function playoffMatches() {
+  const championshipSf1 = {
+    id: "champ-sf1",
+    bracket: "Championship Bracket",
+    round: "Semi-Finals",
+    match: "Semi-Final 1",
+    team1: teamFromRanks({ group: "a", rank: 1 }, { group: "c", rank: 2 }),
+    team2: teamFromRanks({ group: "a", rank: 2 }, { group: "c", rank: 1 }),
+  };
+  const championshipSf2 = {
+    id: "champ-sf2",
+    bracket: "Championship Bracket",
+    round: "Semi-Finals",
+    match: "Semi-Final 2",
+    team1: teamFromRanks({ group: "b", rank: 1 }, { group: "d", rank: 2 }),
+    team2: teamFromRanks({ group: "d", rank: 1 }, { group: "b", rank: 2 }),
+  };
+  const thirdMatch1 = {
+    id: "third-q1",
+    bracket: "3rd Place Playoff Bracket",
+    round: "Qualifying",
+    match: "Match 1",
+    team1: teamFromRanks({ group: "a", rank: 3 }, { group: "c", rank: 4 }),
+    team2: teamFromRanks({ group: "a", rank: 4 }, { group: "c", rank: 3 }),
+  };
+  const thirdMatch2 = {
+    id: "third-q2",
+    bracket: "3rd Place Playoff Bracket",
+    round: "Qualifying",
+    match: "Match 2",
+    team1: teamFromRanks({ group: "b", rank: 3 }, { group: "d", rank: 4 }),
+    team2: teamFromRanks({ group: "b", rank: 4 }, { group: "d", rank: 3 }),
+  };
+  return [
+    championshipSf1,
+    championshipSf2,
+    { id: "champ-final", bracket: "Championship Bracket", round: "Finals", match: "Grand Final", team1: playoffWinner("champ-sf1", "Winner SF 1"), team2: playoffWinner("champ-sf2", "Winner SF 2") },
+    thirdMatch1,
+    thirdMatch2,
+    { id: "third-final", bracket: "3rd Place Playoff Bracket", round: "Final", match: "3rd Place Final", team1: playoffWinner("third-q1", "Winner Match 1"), team2: playoffWinner("third-q2", "Winner Match 2") },
+  ];
+}
+
+function render() {
+  eventTitle.textContent = state.eventName || "Pickleball Tournament";
+  let html = "";
+  if (state.view === "all" || state.view === "ab") html += groupScreen("Schedule: Group A & Group B", ["a", "b"]);
+  if (state.view === "all" || state.view === "cd") html += groupScreen("Schedule: Group C & Group D", ["c", "d"]);
+  if (state.view === "all" || state.view === "playoff") html += playoffScreen();
+  stage.innerHTML = html;
+  updatedAtEl.textContent = state.updatedAt ? `Updated ${new Date(state.updatedAt).toLocaleTimeString()}` : "";
+}
+
+function groupScreen(title, visibleGroups) {
+  return `
+    <section class="schedule-screen">
+      <div class="screen-head"><h2>${escapeHtml(title)} <span aria-label="Trophy">🏆</span></h2></div>
+      <div class="group-grid">${visibleGroups.map(groupCard).join("")}</div>
+    </section>
+  `;
+}
+
+function groupCard(groupId) {
+  const players = parsePlayers(state.groups[groupId] || "");
+  const rounds = getRounds(players);
+  const rows = rounds.map((round, index) => {
+    const score = state.scores[scoreKey(groupId, index)] || {};
+    return `
+      <tr>
+        <td>Round ${index + 1}</td><td>${escapeHtml(round.team1)}</td><td class="vs">vs</td><td>${escapeHtml(round.team2)}</td>
+        <td><span class="score-text">${score.t1 || "-"} : ${score.t2 || "-"}</span></td><td class="bye">${escapeHtml(round.bye)}</td>
+      </tr>
+    `;
+  }).join("");
+  return `
+    <section class="tournament-card">
+      <p class="group-name"><strong>${groupNames[groupId]}:</strong> ${escapeHtml(players.join(", ") || "Add five players")}</p>
+      <div class="table-wrap">
+        <table class="schedule-table" aria-label="${groupNames[groupId]} schedule">
+          <thead><tr><th>Round</th><th>Team 1</th><th class="vs">VS</th><th>Team 2</th><th>Score</th><th>Bye</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      ${standingsTable(players, rounds, groupId)}
+    </section>
+  `;
+}
+
+function standingsTable(players, rounds, groupId) {
+  const rows = standings(players, rounds, groupId).map((row, index) => `
+    <tr><td>${index + 1}. ${escapeHtml(row.player)}</td><td>${row.played}</td><td>${row.totalPoints}</td></tr>
+  `).join("");
+  return `
+    <div class="standings">
+      <p class="group-name"><strong>${groupNames[groupId]} Standings</strong></p>
+      <div class="table-wrap"><table aria-label="${groupNames[groupId]} standings"><thead><tr><th>Player</th><th>Games</th><th>Total Points</th></tr></thead><tbody>${rows}</tbody></table></div>
+    </div>
+  `;
+}
+
+function playoffScreen() {
+  const matches = playoffMatches();
+  const championshipRows = matches.filter((match) => match.bracket === "Championship Bracket").map(playoffRow).join("");
+  const thirdPlaceRows = matches.filter((match) => match.bracket === "3rd Place Playoff Bracket").map(playoffRow).join("");
+  return `
+    <section class="schedule-screen">
+      <div class="screen-head"><h2>Playoff Schedule <span aria-label="Trophy">🏆</span></h2></div>
+      <div class="playoff-grid">
+        <section class="tournament-card">
+          <p class="group-name"><strong>Championship Bracket:</strong> Top 2 players from each group advance.</p>
+          <div class="table-wrap"><table class="schedule-table playoff-schedule-table" aria-label="Championship bracket"><thead><tr><th>Round</th><th>Match</th><th>Team 1</th><th class="vs">VS</th><th>Team 2</th><th>Score</th></tr></thead><tbody>${championshipRows}</tbody></table></div>
+        </section>
+        <section class="tournament-card">
+          <p class="group-name"><strong>3rd Place Playoff Bracket:</strong> 3rd and 4th ranked players cross-pair for 3rd place honors.</p>
+          <div class="table-wrap"><table class="schedule-table playoff-schedule-table" aria-label="3rd place playoff bracket"><thead><tr><th>Round</th><th>Match</th><th>Team 1</th><th class="vs">VS</th><th>Team 2</th><th>Score</th></tr></thead><tbody>${thirdPlaceRows}</tbody></table></div>
+        </section>
+      </div>
+    </section>
+  `;
+}
+
+function playoffRow(match) {
+  const score = state.scores[playoffScoreKey(match.id)] || {};
+  return `
+    <tr>
+      <td>${escapeHtml(match.round)}</td><td class="highlight">${escapeHtml(match.match)}</td><td>${escapeHtml(match.team1)}</td><td class="vs">vs</td><td>${escapeHtml(match.team2)}</td>
+      <td><span class="score-text">${score.t1 || "-"} : ${score.t2 || "-"}</span></td>
+    </tr>
+  `;
+}
+
+function setStatus(message) {
+  statusEl.textContent = message;
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
+}
