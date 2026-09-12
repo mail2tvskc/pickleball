@@ -226,6 +226,10 @@ function scoreKey(groupId, roundIndex) {
   return `${groupId}-${roundIndex}`;
 }
 
+function playoffScoreKey(matchId) {
+  return `playoff-${matchId}`;
+}
+
 function standings(players, rounds, groupId) {
   const rows = new Map(players.map((player) => [player, { player, played: 0, totalPoints: 0 }]));
 
@@ -251,6 +255,88 @@ function standings(players, rounds, groupId) {
   });
 
   return Array.from(rows.values()).sort((a, b) => b.totalPoints - a.totalPoints || a.player.localeCompare(b.player));
+}
+
+function groupRankings(groupId) {
+  const players = parsePlayers(state.groups[groupId] || "");
+  return standings(players, getRounds(players), groupId);
+}
+
+function rankedPlayer(groupId, rank) {
+  return groupRankings(groupId)[rank - 1]?.player || `${groupId.toUpperCase()}${rank}`;
+}
+
+function teamFromRanks(left, right) {
+  return `${rankedPlayer(left.group, left.rank)} & ${rankedPlayer(right.group, right.rank)}`;
+}
+
+function playoffWinner(matchId, fallback) {
+  const match = playoffMatches().find((item) => item.id === matchId);
+  const score = state.scores[playoffScoreKey(matchId)] || {};
+  const s1 = Number(score.t1);
+  const s2 = Number(score.t2);
+  if (!match || score.t1 === "" || score.t2 === "" || !Number.isFinite(s1) || !Number.isFinite(s2) || s1 === s2) {
+    return fallback;
+  }
+  return s1 > s2 ? match.team1 : match.team2;
+}
+
+function playoffMatches() {
+  const championshipSf1 = {
+    id: "champ-sf1",
+    bracket: "Championship Bracket",
+    round: "Semi-Finals",
+    match: "Semi-Final 1",
+    team1: teamFromRanks({ group: "a", rank: 1 }, { group: "c", rank: 2 }),
+    team2: teamFromRanks({ group: "a", rank: 2 }, { group: "c", rank: 1 }),
+  };
+  const championshipSf2 = {
+    id: "champ-sf2",
+    bracket: "Championship Bracket",
+    round: "Semi-Finals",
+    match: "Semi-Final 2",
+    team1: teamFromRanks({ group: "b", rank: 1 }, { group: "d", rank: 2 }),
+    team2: teamFromRanks({ group: "d", rank: 1 }, { group: "b", rank: 2 }),
+  };
+  const thirdMatch1 = {
+    id: "third-q1",
+    bracket: "3rd Place Playoff Bracket",
+    round: "Qualifying",
+    match: "Match 1",
+    team1: teamFromRanks({ group: "a", rank: 3 }, { group: "c", rank: 4 }),
+    team2: teamFromRanks({ group: "a", rank: 4 }, { group: "c", rank: 3 }),
+  };
+  const thirdMatch2 = {
+    id: "third-q2",
+    bracket: "3rd Place Playoff Bracket",
+    round: "Qualifying",
+    match: "Match 2",
+    team1: teamFromRanks({ group: "b", rank: 3 }, { group: "d", rank: 4 }),
+    team2: teamFromRanks({ group: "b", rank: 4 }, { group: "d", rank: 3 }),
+  };
+
+  return [
+    championshipSf1,
+    championshipSf2,
+    {
+      id: "champ-final",
+      bracket: "Championship Bracket",
+      round: "Finals",
+      match: "Grand Final",
+      team1: playoffWinner("champ-sf1", "Winner SF 1"),
+      team2: playoffWinner("champ-sf2", "Winner SF 2"),
+    },
+    thirdMatch1,
+    thirdMatch2,
+    {
+      id: "third-final",
+      bracket: "3rd Place Playoff Bracket",
+      round: "Final",
+      match: "3rd Place Final",
+      team1: playoffWinner("third-q1", "Winner Match 1"),
+      team2: playoffWinner("third-q2", "Winner Match 2"),
+    },
+  ];
 }
 
 function render() {
@@ -372,6 +458,10 @@ function standingsTable(players, rounds, groupId) {
 }
 
 function playoffScreen() {
+  const matches = playoffMatches();
+  const championshipRows = matches.filter((match) => match.bracket === "Championship Bracket").map(playoffRow).join("");
+  const thirdPlaceRows = matches.filter((match) => match.bracket === "3rd Place Playoff Bracket").map(playoffRow).join("");
+
   return `
     <section class="schedule-screen">
       <div class="screen-head">
@@ -383,13 +473,9 @@ function playoffScreen() {
           <div class="table-wrap">
             <table class="schedule-table playoff-schedule-table" aria-label="Championship bracket">
               <thead>
-                <tr><th>Round</th><th>Match</th><th>Team 1</th><th class="vs">VS</th><th>Team 2</th></tr>
+                <tr><th>Round</th><th>Match</th><th>Team 1</th><th class="vs">VS</th><th>Team 2</th><th>Score</th></tr>
               </thead>
-              <tbody>
-                <tr><td>Semi-Finals</td><td class="highlight">Semi-Final 1</td><td>A1 & C2</td><td class="vs">vs</td><td>A2 & C1</td></tr>
-                <tr><td>Semi-Finals</td><td class="highlight">Semi-Final 2</td><td>B1 & D2</td><td class="vs">vs</td><td>D1 & B2</td></tr>
-                <tr><td>Finals</td><td class="highlight">Grand Final</td><td>Winner SF 1</td><td class="vs">vs</td><td>Winner SF 2</td></tr>
-              </tbody>
+              <tbody>${championshipRows}</tbody>
             </table>
           </div>
         </section>
@@ -398,19 +484,41 @@ function playoffScreen() {
           <div class="table-wrap">
             <table class="schedule-table playoff-schedule-table" aria-label="3rd place playoff bracket">
               <thead>
-                <tr><th>Round</th><th>Match</th><th>Team 1</th><th class="vs">VS</th><th>Team 2</th></tr>
+                <tr><th>Round</th><th>Match</th><th>Team 1</th><th class="vs">VS</th><th>Team 2</th><th>Score</th></tr>
               </thead>
-              <tbody>
-                <tr><td>Qualifying</td><td class="highlight">Match 1</td><td>A3 & C4</td><td class="vs">vs</td><td>A4 & C3</td></tr>
-                <tr><td>Qualifying</td><td class="highlight">Match 2</td><td>B3 & D4</td><td class="vs">vs</td><td>B4 & D3</td></tr>
-                <tr><td>Final</td><td class="highlight">3rd Place Final</td><td>Winner Match 1</td><td class="vs">vs</td><td>Winner Match 2</td></tr>
-              </tbody>
+              <tbody>${thirdPlaceRows}</tbody>
             </table>
           </div>
         </section>
       </div>
     </section>
   `;
+}
+
+function playoffRow(match) {
+  return `
+    <tr>
+      <td>${escapeHtml(match.round)}</td>
+      <td class="highlight">${escapeHtml(match.match)}</td>
+      <td>${escapeHtml(match.team1)}</td>
+      <td class="vs">vs</td>
+      <td>${escapeHtml(match.team2)}</td>
+      <td>${playoffScoreCell(match.id)}</td>
+    </tr>
+  `;
+}
+
+function playoffScoreCell(matchId) {
+  const key = playoffScoreKey(matchId);
+  const score = state.scores[key] || { t1: "", t2: "" };
+  if (mode === "admin" && signedIn) {
+    return `<div class="score-entry">
+      <input data-score="${key}" data-side="t1" inputmode="numeric" type="number" min="0" max="99" value="${escapeHtml(score.t1 || "")}" aria-label="${matchId} team 1 score">
+      <span>:</span>
+      <input data-score="${key}" data-side="t2" inputmode="numeric" type="number" min="0" max="99" value="${escapeHtml(score.t2 || "")}" aria-label="${matchId} team 2 score">
+    </div>`;
+  }
+  return `<span class="score-text">${score.t1 || "-"} : ${score.t2 || "-"}</span>`;
 }
 
 function scheduleSave() {
