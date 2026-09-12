@@ -445,6 +445,20 @@ h3 {
   color: var(--gold);
 }
 
+.overall-table {
+  min-width: 360px;
+}
+
+.overall-table th:first-child,
+.overall-table td:first-child {
+  width: auto;
+}
+
+.overall-table th:last-child,
+.overall-table td:last-child {
+  width: 150px;
+}
+
 .third-place-card .playoff-schedule-table th {
   background: linear-gradient(90deg, rgba(255, 122, 89, 0.44), rgba(183, 148, 244, 0.22));
 }
@@ -707,6 +721,35 @@ h3 {
 
   .standings table {
     min-width: 0;
+  }
+
+  .overall-card {
+    padding: 8px;
+  }
+
+  .overall-card .table-wrap {
+    overflow-x: visible;
+  }
+
+  .overall-table {
+    min-width: 0;
+    table-layout: fixed;
+  }
+
+  .overall-table th,
+  .overall-table td {
+    padding: 9px 8px;
+  }
+
+  .overall-table th:first-child,
+  .overall-table td:first-child {
+    width: auto;
+  }
+
+  .overall-table th:last-child,
+  .overall-table td:last-child {
+    width: 98px;
+    text-align: center;
   }
 
   .standings th,
