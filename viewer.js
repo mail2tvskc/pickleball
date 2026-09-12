@@ -93,14 +93,21 @@ function team(players) {
 function getRounds(players) {
   const list = players.slice(0, 5);
   while (list.length < 5) list.push("TBD");
-  return [4, 3, 2, 1, 0].map((byeIndex) => {
-    const active = list.filter((_, index) => index !== byeIndex);
+  return [
+    { p1: [0, 1], p2: [2, 3], bye: 4 },
+    { p1: [0, 2], p2: [3, 4], bye: 1 },
+    { p1: [0, 3], p2: [1, 4], bye: 2 },
+    { p1: [0, 4], p2: [1, 2], bye: 3 },
+    { p1: [1, 3], p2: [2, 4], bye: 0 },
+  ].map((round) => {
+    const p1 = round.p1.map((index) => list[index]);
+    const p2 = round.p2.map((index) => list[index]);
     return {
-      p1: [active[0], active[1]].filter((player) => player !== "TBD"),
-      p2: [active[2], active[3]].filter((player) => player !== "TBD"),
-      team1: team([active[0], active[1]]),
-      team2: team([active[2], active[3]]),
-      bye: list[byeIndex],
+      p1: p1.filter((player) => player !== "TBD"),
+      p2: p2.filter((player) => player !== "TBD"),
+      team1: team(p1),
+      team2: team(p2),
+      bye: list[round.bye],
     };
   });
 }
