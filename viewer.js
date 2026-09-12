@@ -7,7 +7,7 @@ const defaultGroups = {
   d: "Phani, Chaitanya T., Kishore, Sreenivasa, Ramesh",
 };
 const defaultState = {
-  eventName: "Saturday Pickleball Cup",
+  eventName: "ColdStream Pickleball Club Tournmant",
   view: "all",
   courts: 2,
   groups: defaultGroups,
