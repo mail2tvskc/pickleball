@@ -453,11 +453,7 @@
       function standings(players, rounds, groupId) {
         const table = new Map(players.map((player) => [player, {
           player,
-          wins: 0,
-          losses: 0,
-          pointsFor: 0,
-          pointsAgainst: 0,
-          diff: 0,
+          totalPoints: 0,
           played: 0
         }]));
 
@@ -465,32 +461,22 @@
           const score = scoreState.scores[scoreKey(groupId, index)] || {};
           const s1 = Number(score.t1);
           const s2 = Number(score.t2);
-          if (!Number.isFinite(s1) || !Number.isFinite(s2) || score.t1 === "" || score.t2 === "" || s1 === s2) return;
-          const t1Won = s1 > s2;
+          if (!Number.isFinite(s1) || !Number.isFinite(s2) || score.t1 === "" || score.t2 === "") return;
           round.p1.forEach((player) => {
             const row = table.get(player);
             if (!row) return;
             row.played += 1;
-            row.wins += t1Won ? 1 : 0;
-            row.losses += t1Won ? 0 : 1;
-            row.pointsFor += s1;
-            row.pointsAgainst += s2;
+            row.totalPoints += s1;
           });
           round.p2.forEach((player) => {
             const row = table.get(player);
             if (!row) return;
             row.played += 1;
-            row.wins += t1Won ? 0 : 1;
-            row.losses += t1Won ? 1 : 0;
-            row.pointsFor += s2;
-            row.pointsAgainst += s1;
+            row.totalPoints += s2;
           });
         });
 
-        return Array.from(table.values()).map((row) => ({
-          ...row,
-          diff: row.pointsFor - row.pointsAgainst
-        })).sort((a, b) => b.wins - a.wins || b.diff - a.diff || b.pointsFor - a.pointsFor || a.player.localeCompare(b.player));
+        return Array.from(table.values()).sort((a, b) => b.totalPoints - a.totalPoints || a.player.localeCompare(b.player));
       }
 
       function standingsTable(players, rounds, groupId) {
@@ -498,11 +484,7 @@
           <tr>
             <td>${index + 1}. ${esc(row.player)}</td>
             <td>${row.played}</td>
-            <td>${row.wins}</td>
-            <td>${row.losses}</td>
-            <td>${row.pointsFor}</td>
-            <td>${row.pointsAgainst}</td>
-            <td>${row.diff}</td>
+            <td>${row.totalPoints}</td>
           </tr>
         `).join("");
 
@@ -512,7 +494,7 @@
             <div class="pb-table-wrap">
               <table aria-label="${names[groupId]} standings">
                 <thead>
-                  <tr><th>Player</th><th>P</th><th>W</th><th>L</th><th>PF</th><th>PA</th><th>+/-</th></tr>
+                  <tr><th>Player</th><th>Games</th><th>Total Points</th></tr>
                 </thead>
                 <tbody>${rows}</tbody>
               </table>
